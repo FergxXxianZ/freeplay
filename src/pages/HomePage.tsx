@@ -33,12 +33,7 @@ export const HomePage: React.FC = () => {
 
       {/* Hero Banner — only on first page without search */}
       {!searchQuery && currentPage === 1 && (
-        <div style={{
-          position: 'relative',
-          height: 320,
-          marginTop: -68, // Pull up under navbar
-          marginBottom: 40,
-          overflow: 'hidden',
+        <div className="relative overflow-hidden mb-10 mt-[-68px] h-[280px] md:h-[320px]" style={{
           background: 'linear-gradient(135deg, #0d0d0d 0%, #1a0a0a 50%, #0d0d0d 100%)',
         }}>
           {/* Background pattern */}
@@ -57,10 +52,7 @@ export const HomePage: React.FC = () => {
           }} />
 
           {/* Hero Content */}
-          <div style={{
-            position: 'absolute', bottom: 40, left: 40,
-            maxWidth: 500,
-          }}>
+          <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 max-w-[500px]">
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               background: '#E50914', color: '#fff',
@@ -72,9 +64,8 @@ export const HomePage: React.FC = () => {
               <Film style={{ width: 11, height: 11 }} />
               FreePlay Original
             </div>
-            <h1 style={{
+            <h1 className="text-3xl md:text-5xl lg:text-[2.2rem]" style={{
               fontFamily: 'Inter, sans-serif',
-              fontSize: '2.2rem',
               fontWeight: 800,
               color: '#fff',
               lineHeight: 1.15,
@@ -106,7 +97,7 @@ export const HomePage: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <div id="content" style={{ maxWidth: 1400, margin: '0 auto', padding: '0 32px 48px' }}>
+      <div id="content" className="mx-auto px-4 sm:px-6 md:px-8 pb-12" style={{ maxWidth: 1400 }}>
 
         {/* Section Header */}
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
@@ -119,8 +110,8 @@ export const HomePage: React.FC = () => {
                     Hasil Pencarian
                   </span>
                 </div>
-                <h2 style={{
-                  fontFamily: 'Inter, sans-serif', fontSize: '1.6rem', fontWeight: 800,
+                <h2 className="text-xl md:text-2xl lg:text-[1.6rem]" style={{
+                  fontFamily: 'Inter, sans-serif', fontWeight: 800,
                   color: '#fff', letterSpacing: '-0.02em', margin: 0,
                 }}>
                   "{searchQuery}"
@@ -128,8 +119,8 @@ export const HomePage: React.FC = () => {
               </>
             ) : (
               <>
-                <h2 className="red-accent" style={{
-                  fontFamily: 'Inter, sans-serif', fontSize: '1.4rem', fontWeight: 700,
+                <h2 className="red-accent text-lg md:text-xl lg:text-[1.4rem]" style={{
+                  fontFamily: 'Inter, sans-serif', fontWeight: 700,
                   color: '#fff', letterSpacing: '-0.01em', margin: 0,
                 }}>
                   {currentPage === 1 ? 'Recommended For You' : `Page ${currentPage}`}
@@ -148,10 +139,8 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-          gap: 12,
+        <div className="grid gap-3 sm:gap-4" style={{
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 160px), 1fr))',
         }}>
           <AnimatePresence mode="wait">
             {loading ? (

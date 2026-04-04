@@ -64,10 +64,10 @@ export const UploadPage: React.FC = () => {
       const res = await fetch('/api/videos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          title: title.trim(), 
+        body: JSON.stringify({
+          title: title.trim(),
           video_url: finalUrl,
-          code: accessCode.trim() 
+          code: accessCode.trim()
         }),
       });
       if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Upload failed'); }
@@ -104,7 +104,7 @@ export const UploadPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 80px' }}>
+    <div className="mx-auto px-4 sm:px-6 md:px-8 py-8 pb-20" style={{ maxWidth: 680 }}>
 
       {/* Back */}
       <button
@@ -152,11 +152,10 @@ export const UploadPage: React.FC = () => {
       </div>
 
       {/* Form */}
-      <div style={{
+      <div className="p-5 sm:p-7 md:p-8" style={{
         background: 'rgba(255,255,255,0.03)',
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: 12,
-        padding: '28px 28px 32px',
         borderTop: '3px solid #E50914',
       }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -214,7 +213,7 @@ export const UploadPage: React.FC = () => {
                 type="text"
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
-                placeholder="Masukkan URL disini "
+                placeholder="Masukan URL disini"
                 required
                 style={inputStyle}
                 onFocus={(e) => {

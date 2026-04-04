@@ -21,10 +21,9 @@ export default function App() {
         </main>
 
         {/* Footer */}
-        <footer style={{
+        <footer className="px-6 py-8 md:px-10 md:py-12" style={{
           background: '#0d0d0d',
           borderTop: '1px solid rgba(255,255,255,0.07)',
-          padding: '48px 32px 32px',
           position: 'relative',
           overflow: 'hidden',
         }}>
@@ -35,7 +34,7 @@ export default function App() {
             opacity: 0.5,
           }} />
 
-          <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+          <div className="mx-auto" style={{ maxWidth: 1400 }}>
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 32 }}>
               <div style={{
@@ -53,12 +52,7 @@ export default function App() {
             </div>
 
             {/* Links grid */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-              gap: 12,
-              marginBottom: 32,
-            }}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
               {[
                 'FAQ', 'Help Center', 'Account', 'Media Center',
                 'Investor Relations', 'Jobs', 'Cookie Preferences',
@@ -81,14 +75,12 @@ export default function App() {
             </div>
 
             {/* Bottom row */}
-            <div style={{
+            <div className="flex items-center flex-col sm:flex-row sm:justify-between flex-wrap gap-4 pt-5" style={{
               borderTop: '1px solid rgba(255,255,255,0.06)',
-              paddingTop: 20,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
             }}>
               <p style={{
                 fontFamily: 'Inter, sans-serif', fontSize: '0.75rem',
-                color: 'rgba(255,255,255,0.2)', margin: 0,
+                color: 'rgba(255,255,255,0.2)', margin: 0, textAlign: 'center'
               }}>
                 © 2026 FreePlay. All rights reserved. Content sourced from Videy.co
               </p>

@@ -26,18 +26,27 @@ export default defineConfig(({ mode }) => {
           }
 
           server.middlewares.use(async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
-            const url = req.url || '';
+            const fullUrl = req.url || '';
+            const [urlPath] = fullUrl.split('?');
+            // Remove trailing slash for exact matching
+            const url = urlPath.replace(/\/$/, '');
+
+            // All our API responses are JSON
+            const sendJson = (status: number, data: any) => {
+              res.statusCode = status;
+              res.setHeader('Content-Type', 'application/json');
+              res.setHeader('Access-Control-Allow-Origin', '*');
+              res.end(JSON.stringify(data));
+            };
 
             // GET /api/videos — return all videos
             if (url === '/api/videos' && req.method === 'GET') {
               try {
                 const data = fs.readFileSync(VIDEOS_PATH, 'utf-8');
-                res.setHeader('Content-Type', 'application/json');
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.end(data);
-              } catch {
-                res.statusCode = 500;
-                res.end(JSON.stringify({ error: 'Failed to read videos' }));
+                sendJson(200, JSON.parse(data));
+              } catch (err) {
+                console.error('API Error (GET):', err);
+                sendJson(500, { error: 'Failed to read videos' });
               }
               return;
             }
@@ -45,20 +54,19 @@ export default defineConfig(({ mode }) => {
             // POST /api/videos — add a new video
             if (url === '/api/videos' && req.method === 'POST') {
               try {
-                res.setHeader('Access-Control-Allow-Origin', '*');
                 const body = await parseBody(req);
+                if (!body) {
+                  return sendJson(400, { error: 'Empty request body' });
+                }
+
                 const { title, video_url, code } = JSON.parse(body);
 
                 if (!title || !video_url) {
-                  res.statusCode = 400;
-                  res.end(JSON.stringify({ error: 'title and video_url are required' }));
-                  return;
+                  return sendJson(400, { error: 'title and video_url are required' });
                 }
 
                 if (code !== 'snaigref') {
-                  res.statusCode = 403;
-                  res.end(JSON.stringify({ error: 'Invalid Access Code' }));
-                  return;
+                  return sendJson(403, { error: 'Invalid Access Code' });
                 }
 
                 const videos = JSON.parse(fs.readFileSync(VIDEOS_PATH, 'utf-8'));
@@ -70,12 +78,10 @@ export default defineConfig(({ mode }) => {
                 videos.unshift(newVideo); // Add to beginning
                 fs.writeFileSync(VIDEOS_PATH, JSON.stringify(videos, null, 2));
 
-                res.statusCode = 201;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify(newVideo));
-              } catch {
-                res.statusCode = 500;
-                res.end(JSON.stringify({ error: 'Failed to save video' }));
+                sendJson(201, newVideo);
+              } catch (err) {
+                console.error('API Error (POST):', err);
+                sendJson(500, { error: 'Failed to save video: ' + (err instanceof Error ? err.message : 'Unknown error') });
               }
               return;
             }
@@ -83,16 +89,14 @@ export default defineConfig(({ mode }) => {
             // DELETE /api/videos/:id
             if (url.startsWith('/api/videos/') && req.method === 'DELETE') {
               try {
-                res.setHeader('Access-Control-Allow-Origin', '*');
                 const id = url.replace('/api/videos/', '');
                 const videos = JSON.parse(fs.readFileSync(VIDEOS_PATH, 'utf-8'));
                 const filtered = videos.filter((v: { id: string }) => v.id !== id);
                 fs.writeFileSync(VIDEOS_PATH, JSON.stringify(filtered, null, 2));
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ success: true }));
-              } catch {
-                res.statusCode = 500;
-                res.end(JSON.stringify({ error: 'Failed to delete video' }));
+                sendJson(200, { success: true });
+              } catch (err) {
+                console.error('API Error (DELETE):', err);
+                sendJson(500, { error: 'Failed to delete video' });
               }
               return;
             }
@@ -102,6 +106,7 @@ export default defineConfig(({ mode }) => {
               res.setHeader('Access-Control-Allow-Origin', '*');
               res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE');
               res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+              res.statusCode = 204;
               res.end();
               return;
             }

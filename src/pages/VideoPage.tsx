@@ -42,7 +42,7 @@ export const VideoPage: React.FC = () => {
   const isSecureUrl = video.video_url.startsWith('https://cdn.videy.co/') || video.video_url.startsWith('https://cdn2.videy.co/') || video.video_url.startsWith('https://videy.co/');
 
   return (
-    <div style={{ maxWidth: 1400, margin: '0 auto', padding: '24px 32px 64px' }}>
+    <div className="mx-auto px-4 sm:px-6 md:px-8 py-6 pb-16" style={{ maxWidth: 1400 }}>
 
       {/* Back */}
       <Link
@@ -60,7 +60,7 @@ export const VideoPage: React.FC = () => {
         Kembali
       </Link>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32 }} className="lg:grid">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8">
 
         {/* Main */}
         <div>
@@ -141,7 +141,7 @@ export const VideoPage: React.FC = () => {
               </div>
 
               {/* Action buttons */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap mt-4 sm:mt-0">
                 <button
                   onClick={() => setLiked(!liked)}
                   style={{

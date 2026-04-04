@@ -40,7 +40,7 @@ export const Navbar: React.FC = () => {
         borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
       }}
     >
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 32px' }}>
+      <div className="mx-auto px-4 sm:px-6 md:px-8" style={{ maxWidth: 1400 }}>
         <div style={{ display: 'flex', alignItems: 'center', height: 68, gap: 32 }}>
 
           {/* Logo */}
