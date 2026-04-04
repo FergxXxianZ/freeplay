@@ -214,7 +214,7 @@ export const UploadPage: React.FC = () => {
                 type="text"
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
-                placeholder="cdn.videy.co/XXXX.mp4"
+                placeholder="Masukkan URL disini "
                 required
                 style={inputStyle}
                 onFocus={(e) => {
@@ -231,10 +231,10 @@ export const UploadPage: React.FC = () => {
             </div>
             <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
               <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
-                💡 URL embed (<code style={{ color: 'rgba(255,255,255,0.45)' }}>videy.co/v/?id=XXX</code>) → otomatis dikonversi ke <code style={{ color: 'rgba(255,255,255,0.45)' }}>cdn.videy.co</code>
+                💡 Masukan URL yang benar !!
               </p>
               <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
-                ✅ URL langsung (<code style={{ color: 'rgba(255,255,255,0.45)' }}>cdn.videy.co</code> atau <code style={{ color: 'rgba(255,255,255,0.45)' }}>cdn2.videy.co</code>) → disimpan apa adanya
+                ✅ URL otomatis tersimpan di database
               </p>
             </div>
           </div>
