@@ -41,7 +41,7 @@ export const Navbar: React.FC = () => {
       }}
     >
       <div className="mx-auto px-4 sm:px-6 md:px-8" style={{ maxWidth: 1400 }}>
-        <div style={{ display: 'flex', alignItems: 'center', height: 68, gap: 32 }}>
+        <div className="flex items-center h-[68px] gap-4 sm:gap-8">
 
           {/* Logo */}
           <Link to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
@@ -59,11 +59,12 @@ export const Navbar: React.FC = () => {
               <span style={{
                 fontFamily: 'Inter, sans-serif',
                 fontWeight: 800,
-                fontSize: '1.4rem',
                 letterSpacing: '-0.02em',
                 color: '#E50914',
                 textShadow: '0 0 20px rgba(229,9,20,0.4)',
-              }}>
+              }}
+              className="text-xl sm:text-[1.4rem]"
+              >
                 FREEPLAY
               </span>
             </div>
@@ -103,7 +104,7 @@ export const Navbar: React.FC = () => {
           <div style={{ flex: 1 }} />
 
           {/* Right controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
 
             {/* Search */}
             <div style={{ position: 'relative' }}>
@@ -155,15 +156,6 @@ export const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* Bell */}
-            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', padding: 8, lineHeight: 1 }}
-              className="hidden sm:block"
-              onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.color = '#fff')}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.7)')}
-            >
-              <Bell style={{ width: 20, height: 20 }} />
-            </button>
-
             {/* Upload button */}
             <Link
               to="/upload"
@@ -171,7 +163,6 @@ export const Navbar: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '7px 16px',
                 background: isUploadPage ? '#E50914' : 'transparent',
                 border: '1px solid ' + (isUploadPage ? '#E50914' : 'rgba(255,255,255,0.3)'),
                 borderRadius: 4,
@@ -183,6 +174,7 @@ export const Navbar: React.FC = () => {
                 transition: 'all 0.2s',
                 whiteSpace: 'nowrap',
               }}
+              className="px-2 py-[6px] sm:px-4 sm:py-[7px]"
               onMouseEnter={(e) => {
                 if (!isUploadPage) {
                   (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(229,9,20,0.15)';
