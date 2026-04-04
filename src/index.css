@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Base ── */
+@layer base {
+  body {
+    background-color: #141414;
+    color: #e5e5e5;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    antialiased: true;
+    overflow-x: hidden;
+  }
+}
+
+/* ── Rich Textured Background ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    /* Vignette edges */
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(229,9,20,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(229,9,20,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 60% at 0% 50%, rgba(0,0,0,0.6) 0%, transparent 50%),
+    /* Subtle diagonal lines pattern */
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,0.012) 40px,
+      rgba(255,255,255,0.012) 41px
+    ),
+    /* Base gradient */
+    linear-gradient(180deg, #0d0d0d 0%, #141414 30%, #111 60%, #0a0a0a 100%);
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Noise Texture Overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0d0d0d; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #E50914; }
+
+/* ── Netflix-style Animations ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -800px 0; }
+  100% { background-position: 800px 0; }
+}
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(229,9,20,0); }
+  50%       { box-shadow: 0 0 20px 4px rgba(229,9,20,0.3); }
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.animate-fade-up { animation: fadeInUp 0.5s ease forwards; }
+.animate-pulse-red { animation: pulse-red 2s ease-in-out infinite; }
+
+/* ── Skeleton Loader ── */
+.skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #242424 50%, #1a1a1a 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 4px;
+}
+
+/* ── Netflix Card Glow ── */
+.nf-card-glow {
+  box-shadow:
+    0 4px 6px rgba(0,0,0,0.5),
+    0 10px 30px rgba(0,0,0,0.4);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.nf-card-glow:hover {
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.8),
+    0 20px 60px rgba(0,0,0,0.5),
+    0 0 0 2px rgba(229,9,20,0.6);
+}
+
+/* ── Video Controls ── */
+video::-webkit-media-controls-panel {
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+}
+
+/* ── Red Underline Accent ── */
+.red-accent {
+  position: relative;
+}
+.red-accent::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: #E50914;
+  border-radius: 2px;
+}
