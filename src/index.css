@@ -123,3 +123,12 @@ video::-webkit-media-controls-panel {
   background: #E50914;
   border-radius: 2px;
 }
+
+/* ── Mobile Hamburger ── */
+@media (min-width: 640px) {
+  #hamburger-btn { display: none !important; }
+}
+@media (max-width: 639px) {
+  .desktop-nav-links { display: none !important; }
+  .desktop-avatar     { display: none !important; }
+}

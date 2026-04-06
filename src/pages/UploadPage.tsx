@@ -16,41 +16,69 @@ export const UploadPage: React.FC = () => {
 
   // Pola URL yang diizinkan
   const ALLOWED_PATTERNS = [
-    /^(?:https:\/\/)?cdn\.videy\.co\/[a-zA-Z0-9]+\.mp4$/,
-    /^(?:https:\/\/)?cdn2\.videy\.co\/[a-zA-Z0-9]+\.mp4$/,
-    /^(?:https?:\/\/)?(?:www\.)?videy\.co\/v\/\?id=[a-zA-Z0-9]+$/,
+    /^(?:https?:\/\/)?cdn\.videy\.co\/[a-zA-Z0-9_\-]+\.mp4$/,
+    /^(?:https?:\/\/)?cdn2\.videy\.co\/[a-zA-Z0-9_\-]+\.mp4$/,
+    /^(?:https?:\/\/)?(?:www\.)?videy\.co\/v\/?\?id=[a-zA-Z0-9_\-]+$/,
   ];
 
   const isValidUrl = (val: string) => ALLOWED_PATTERNS.some((p) => p.test(val.trim()));
 
+  const extractVideyId = (val: string): string | null => {
+    // Coba parse sebagai URL resmi menggunakan URLSearchParams
+    try {
+      const withScheme = val.trim().startsWith('http') ? val.trim() : `https://${val.trim()}`;
+      const parsed = new URL(withScheme);
+      const isVideyHost =
+        parsed.hostname === 'videy.co' ||
+        parsed.hostname === 'www.videy.co';
+      if (isVideyHost) {
+        const id = parsed.searchParams.get('id');
+        if (id && id.length > 0) return id;
+      }
+    } catch {
+      // Bukan URL valid, tidak apa-apa
+    }
+    return null;
+  };
+
+  // onChange: hanya update state, validasi ringan
   const handleUrlChange = (val: string) => {
-    // Hanya konversi jika format embed page (videy.co/v/?id=XXX)
-    // cdn.videy.co dan cdn2.videy.co disimpan apa adanya
-    const embedMatch = val.match(/(?:^|\/)videy\.co\/v\/\?id=([a-zA-Z0-9]+)/);
-    if (embedMatch) {
-      const converted = `https://cdn.videy.co/${embedMatch[1]}.mp4`;
-      setUrl(converted);
-      setUrlError('');
-    } else {
-      setUrl(val);
-      // Validasi realtime (hanya tampilkan error jika sudah ada isi)
-      if (val.trim() && !isValidUrl(val)) {
-        setUrlError('URL tidak valid. Hanya cdn.videy.co, cdn2.videy.co, atau videy.co/v/?id=XXX yang diizinkan.');
+    setUrl(val);
+    if (val.trim() && !isValidUrl(val)) {
+      // Jangan tampilkan error saat sedang mengetik embed URL
+      const looksLikeEmbed = val.toLowerCase().includes('videy.co');
+      if (!looksLikeEmbed) {
+        setUrlError('URL tidak valid. Gunakan format: cdn.videy.co/ID.mp4 atau videy.co/v/?id=ID');
       } else {
         setUrlError('');
       }
+    } else {
+      setUrlError('');
+    }
+  };
+
+  // onBlur: konversi URL embed ke format CDN
+  const handleUrlBlur = (val: string) => {
+    const videoId = extractVideyId(val);
+    if (videoId) {
+      const converted = `https://cdn.videy.co/${videoId}.mp4`;
+      setUrl(converted);
+      setUrlError('');
+    } else if (val.trim() && !isValidUrl(val)) {
+      setUrlError('URL tidak valid. Gunakan format: cdn.videy.co/ID.mp4 atau videy.co/v/?id=ID');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanedUrl = url.trim();
+
     if (!isValidUrl(cleanedUrl)) {
-      setUrlError('URL tidak valid. Format yang diizinkan: cdn.videy.co atau cdn2.videy.co.');
+      setUrlError('URL tidak valid. Format yang diizinkan: cdn.videy.co/ID.mp4');
       return;
     }
 
-    // Auto-prefix https:// if missing or incorrect
+    // Auto-prefix https:// jika belum ada
     let finalUrl = cleanedUrl;
     if (finalUrl.startsWith('http://')) {
       finalUrl = finalUrl.replace('http://', 'https://');
@@ -70,12 +98,17 @@ export const UploadPage: React.FC = () => {
           code: accessCode.trim()
         }),
       });
-      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Upload failed'); }
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Upload gagal');
+      }
       const newVideo = await res.json();
       setRecentUploads((prev) => [newVideo, ...prev]);
       setStatus('success');
       setMessage(`"${newVideo.title}" berhasil ditambahkan!`);
-      setTitle(''); setUrl('');
+      setTitle('');
+      setUrl('');
+      setAccessCode('');
       setTimeout(() => setStatus('idle'), 4000);
     } catch (err: unknown) {
       setStatus('error');
@@ -88,6 +121,8 @@ export const UploadPage: React.FC = () => {
     await fetch(`/api/videos/${id}`, { method: 'DELETE' });
     setRecentUploads((prev) => prev.filter((v) => v.id !== id));
   };
+
+  const isFormReady = title.trim() !== '' && url.trim() !== '' && accessCode.trim() !== '' && !urlError;
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -215,26 +250,38 @@ export const UploadPage: React.FC = () => {
                 onChange={(e) => handleUrlChange(e.target.value)}
                 placeholder="Masukan URL disini"
                 required
-                style={inputStyle}
+                style={{
+                  ...inputStyle,
+                  borderColor: urlError ? 'rgba(229,9,20,0.6)' : 'rgba(255,255,255,0.12)',
+                }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(229,9,20,0.6)';
+                  e.currentTarget.style.borderColor = urlError ? 'rgba(229,9,20,0.8)' : 'rgba(229,9,20,0.6)';
                   e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
                   e.currentTarget.style.boxShadow = '0 0 0 3px rgba(229,9,20,0.1)';
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+                  handleUrlBlur(e.target.value);
+                  e.currentTarget.style.borderColor = urlError ? 'rgba(229,9,20,0.6)' : 'rgba(255,255,255,0.12)';
                   e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               />
             </div>
             <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
-                💡 Masukan URL yang benar !!
-              </p>
-              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
-                ✅ URL otomatis tersimpan di database
-              </p>
+              {urlError ? (
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: '#E50914', margin: 0 }}>
+                  ⚠ {urlError}
+                </p>
+              ) : (
+                <>
+                  <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                    💡 Format: cdn.videy.co/ID.mp4 atau link embed videy.co/v/?id=ID
+                  </p>
+                  <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+                    ✅ URL embed akan otomatis dikonversi ke format CDN
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -300,26 +347,26 @@ export const UploadPage: React.FC = () => {
           {/* Submit */}
           <button
             type="submit"
-            disabled={status === 'loading' || !title || !url}
+            disabled={status === 'loading' || !isFormReady}
             style={{
               padding: '13px',
-              background: (status === 'loading' || !title || !url) ? 'rgba(229,9,20,0.3)' : '#E50914',
+              background: (status === 'loading' || !isFormReady) ? 'rgba(229,9,20,0.3)' : '#E50914',
               border: 'none',
               borderRadius: 6,
               color: '#fff',
               fontFamily: 'Inter, sans-serif', fontSize: '0.9rem', fontWeight: 700,
-              cursor: (status === 'loading' || !title || !url) ? 'not-allowed' : 'pointer',
+              cursor: (status === 'loading' || !isFormReady) ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               transition: 'background 0.2s',
-              boxShadow: (title && url && status !== 'loading') ? '0 4px 20px rgba(229,9,20,0.35)' : 'none',
+              boxShadow: isFormReady && status !== 'loading' ? '0 4px 20px rgba(229,9,20,0.35)' : 'none',
             }}
             onMouseEnter={(e) => {
-              if (title && url && status !== 'loading')
+              if (isFormReady && status !== 'loading')
                 (e.currentTarget as HTMLButtonElement).style.background = '#c40812';
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.background =
-                (status === 'loading' || !title || !url) ? 'rgba(229,9,20,0.3)' : '#E50914';
+                (status === 'loading' || !isFormReady) ? 'rgba(229,9,20,0.3)' : '#E50914';
             }}
           >
             {status === 'loading'
