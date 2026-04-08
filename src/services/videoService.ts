@@ -1,7 +1,7 @@
 import { Video, PaginationData } from '../types';
 import videoData from '../data/videos.json';
 
-const VIDEOS_PER_PAGE = 12;
+const VIDEOS_PER_PAGE = 20;
 
 export const videoService = {
   getVideos: (page: number, searchQuery: string = ''): PaginationData => {
