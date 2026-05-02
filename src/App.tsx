@@ -82,7 +82,7 @@ export default function App() {
                 fontFamily: 'Inter, sans-serif', fontSize: '0.75rem',
                 color: 'rgba(255,255,255,0.2)', margin: 0, textAlign: 'center'
               }}>
-                © 2026 FreePlay. All rights reserved. Content sourced from Videy.co
+                © 2026 FreePlay. Platform video viral. by frgnz
               </p>
               <div style={{
                 display: 'inline-block',
