@@ -140,7 +140,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
               fontSize: '0.7rem',
               color: 'rgba(255,255,255,0.35)',
             }}>
-              Videy.co
+              frgnz.co
             </span>
           </motion.div>
         )}
