@@ -39,7 +39,7 @@ export const VideoPage: React.FC = () => {
     );
   }
 
-  const isSecureUrl = video.video_url.startsWith('https://media.slicedrive.com/') || video.video_url.startsWith('https://cdn.videy.co/') || video.video_url.startsWith('https://cdn2.videy.co/') || video.video_url.startsWith('https://videy.co/');
+  const isSecureUrl = video.video_url.startsWith('https://cdn2.slicedrive.com/') || video.video_url.startsWith('https://media.slicedrive.com/') || video.video_url.startsWith('https://cdn.videy.co/') || video.video_url.startsWith('https://cdn2.videy.co/') || video.video_url.startsWith('https://videy.co/');
 
   return (
     <div className="mx-auto px-4 sm:px-6 md:px-8 py-6 pb-16" style={{ maxWidth: 1400 }}>
