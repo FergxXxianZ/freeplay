@@ -39,7 +39,7 @@ export const VideoPage: React.FC = () => {
     );
   }
 
-  const isSecureUrl = video.video_url.startsWith('https://cdn.videy.co/') || video.video_url.startsWith('https://cdn2.videy.co/') || video.video_url.startsWith('https://videy.co/');
+  const isSecureUrl = video.video_url.startsWith('https://media.slicedrive.com/') || video.video_url.startsWith('https://cdn.videy.co/') || video.video_url.startsWith('https://cdn2.videy.co/') || video.video_url.startsWith('https://videy.co/');
 
   return (
     <div className="mx-auto px-4 sm:px-6 md:px-8 py-6 pb-16" style={{ maxWidth: 1400 }}>
@@ -201,9 +201,9 @@ export const VideoPage: React.FC = () => {
               fontFamily: 'Inter, sans-serif', fontSize: '0.85rem',
               color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0,
             }}>
-              <strong style={{ color: 'rgba(255,255,255,0.9)' }}>FreePlay</strong> · Dipublikasikan 4 April 2026
+              <strong style={{ color: 'rgba(255,255,255,0.9)' }}>FreePlay</strong> · Update Setiap Hari
               <br /><br />
-              Video ini bersumber dari Videy.co. Nikmati pengalaman streaming terbaik di FreePlay — gratis, tanpa batas.
+              Nikmati pengalaman streaming terbaik di FreePlay — gratis, tanpa batas.
             </p>
           </div>
         </div>
