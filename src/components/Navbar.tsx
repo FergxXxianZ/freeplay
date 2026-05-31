@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, Play, X, ChevronDown, Home, Film, Tv, TrendingUp, Menu } from 'lucide-react';
+import { Search, Play, X, Home, Film, Tv, TrendingUp, Menu } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Home', path: '/', icon: Home },
@@ -213,7 +213,7 @@ export const Navbar: React.FC = () => {
               </Link> */}
               
               {/* Avatar — desktop only */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} className="hidden sm:flex desktop-avatar">
+              {/*<div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} className="hidden sm:flex desktop-avatar">
                 <div style={{
                   width: 32, height: 32, borderRadius: 4,
                   background: 'linear-gradient(135deg, #E50914, #831010)',
@@ -223,7 +223,7 @@ export const Navbar: React.FC = () => {
                   FP
                 </div>
                 <ChevronDown style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.6)' }} />
-              </div>
+              </div> */}
 
               {/* Hamburger toggle — mobile only */}
               <button
