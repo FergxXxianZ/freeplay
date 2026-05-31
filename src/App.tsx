@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Navbar } from './components/Navbar';
 import { HomePage } from './pages/HomePage';
 import { VideoPage } from './pages/VideoPage';
-import { UploadPage } from './pages/UploadPage';
 import { Play } from 'lucide-react';
 
 export default function App() {
@@ -15,7 +14,6 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/page/:pageNumber" element={<HomePage />} />
             <Route path="/video/:id" element={<VideoPage />} />
-            <Route path="/upload" element={<UploadPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
