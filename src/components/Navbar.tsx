@@ -173,7 +173,45 @@ export const Navbar: React.FC = () => {
                   </button>
                 )}
               </div>
-
+              
+              {/* Upload button */}
+              <Link
+                to="/upload"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: isUploadPage ? '#E50914' : 'transparent',
+                  border: '1px solid ' + (isUploadPage ? '#E50914' : 'rgba(255,255,255,0.3)'),
+                  borderRadius: 4,
+                  color: isUploadPage ? '#fff' : 'rgba(255,255,255,0.8)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap',
+                }}
+                className="px-2 py-[6px] sm:px-4 sm:py-[7px]"
+                onMouseEnter={(e) => {
+                  if (!isUploadPage) {
+                    (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(229,9,20,0.15)';
+                    (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(229,9,20,0.7)';
+                    (e.currentTarget as HTMLAnchorElement).style.color = '#fff';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isUploadPage) {
+                    (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
+                    (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(255,255,255,0.3)';
+                    (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.8)';
+                  }
+                }}
+              >
+                <Upload style={{ width: 14, height: 14 }} />
+                <span className="hidden sm:inline">Upload</span>
+              </Link>
+              
               {/* Avatar — desktop only */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} className="hidden sm:flex desktop-avatar">
                 <div style={{
@@ -383,6 +421,36 @@ export const Navbar: React.FC = () => {
             );
           })}
         </div>
+        
+        {/* Drawer footer — Upload CTA */}
+        <div style={{
+          padding: '16px 20px 28px',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+        }}>
+          <button
+            onClick={() => handleNavClick('/upload')}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              width: '100%', padding: '12px',
+              background: isUploadPage ? '#E50914' : 'rgba(229,9,20,0.12)',
+              border: '1px solid ' + (isUploadPage ? '#E50914' : 'rgba(229,9,20,0.35)'),
+              borderRadius: 8, cursor: 'pointer',
+              color: '#fff', fontFamily: 'Inter, sans-serif',
+              fontSize: '0.88rem', fontWeight: 700,
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = '#E50914';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = '#E50914';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = isUploadPage ? '#E50914' : 'rgba(229,9,20,0.12)';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = isUploadPage ? '#E50914' : 'rgba(229,9,20,0.35)';
+            }}
+          >
+            <Upload style={{ width: 15, height: 15 }} />
+            Upload Video
+          </button>
 
           {/* User info */}
           <div style={{
