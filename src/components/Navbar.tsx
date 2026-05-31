@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, Play, Upload, X, ChevronDown, Home, Film, Tv, TrendingUp, Menu } from 'lucide-react';
+import { Search, Play, X, ChevronDown, Home, Film, Tv, TrendingUp, Menu } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Home', path: '/', icon: Home },
@@ -46,7 +46,7 @@ export const Navbar: React.FC = () => {
     setMobileOpen(false);
   };
 
-  const isUploadPage = location.pathname === '/upload';
+  {/*const isUploadPage = location.pathname === '/upload'; */}
 
   return (
     <>
@@ -175,7 +175,7 @@ export const Navbar: React.FC = () => {
               </div>
               
               {/* Upload button */}
-              <Link
+              {/* <Link
                 to="/upload"
                 style={{
                   display: 'flex',
@@ -210,7 +210,7 @@ export const Navbar: React.FC = () => {
               >
                 <Upload style={{ width: 14, height: 14 }} />
                 <span className="hidden sm:inline">Upload</span>
-              </Link>
+              </Link> */}
               
               {/* Avatar — desktop only */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} className="hidden sm:flex desktop-avatar">
@@ -427,7 +427,7 @@ export const Navbar: React.FC = () => {
           padding: '16px 20px 28px',
           borderTop: '1px solid rgba(255,255,255,0.08)',
         }}>
-          <button
+          {/*<button
             onClick={() => handleNavClick('/upload')}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -450,7 +450,7 @@ export const Navbar: React.FC = () => {
           >
             <Upload style={{ width: 15, height: 15 }} />
             Upload Video
-          </button>
+          </button> */}
 
           {/* User info */}
           <div style={{
