@@ -1,7 +1,7 @@
 import { Video, PaginationData } from '../types';
 import videoData from '../data/videos.json';
 
-const VIDEOS_PER_PAGE = 20;
+const VIDEOS_PER_PAGE = 30;
 
 export const videoService = {
   getVideos: (page: number, searchQuery: string = ''): PaginationData => {
@@ -35,7 +35,7 @@ export const videoService = {
     return (videoData as Video[]).find(v => v.id === id);
   },
 
-  getRelatedVideos: (currentId: string, limit: number = 4): Video[] => {
+  getRelatedVideos: (currentId: string, limit: number = 10): Video[] => {
     return (videoData as Video[])
       .filter(v => v.id !== currentId)
       .sort(() => 0.5 - Math.random())
