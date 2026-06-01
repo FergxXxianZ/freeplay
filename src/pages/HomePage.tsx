@@ -144,7 +144,7 @@ export const HomePage: React.FC = () => {
         }}>
           <AnimatePresence mode="wait">
             {loading ? (
-              Array.from({ length: 20 }).map((_, i) => <VideoCardSkeleton key={i} />)
+              Array.from({ length: 8 }).map((_, i) => <VideoCardSkeleton key={i} />)
             ) : data?.videos.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}
