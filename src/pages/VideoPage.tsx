@@ -12,6 +12,7 @@ export const VideoPage: React.FC = () => {
   const [related, setRelated] = useState<Video[]>([]);
   const [liked, setLiked] = useState(false);
   const [views, setViews] = useState(0);
+  const [likes, setLikes] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const formatViews = (count: number) => {
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
@@ -38,6 +39,23 @@ export const VideoPage: React.FC = () => {
     return data[videoId];
   };
 
+  const getStoredLikes = (videoId: string) => {
+    const data = JSON.parse(
+      localStorage.getItem('video_likes') || '{}'
+    );
+
+    if (!data[videoId]) {
+      data[videoId] = Math.floor(Math.random() * 15000) + 100;
+
+      localStorage.setItem(
+        'video_likes',
+        JSON.stringify(data)
+      );
+    }
+
+    return data[videoId];
+  };
+
   useEffect(() => {
     if (id) {
       const v = videoService.getVideoById(id);
@@ -48,6 +66,42 @@ export const VideoPage: React.FC = () => {
       }
     }
   }, [id]);
+
+  const handleLike = () => {
+    if (!id) return;
+
+    const likesData = JSON.parse(
+      localStorage.getItem('video_likes') || '{}'
+    );
+
+    const likedVideos = JSON.parse(
+      localStorage.getItem('liked_videos') || '{}'
+    );
+
+    if (likedVideos[id]) {
+      likesData[id] -= 1;
+      delete likedVideos[id];
+
+      setLiked(false);
+    } else {
+      likesData[id] = (likesData[id] || 0) + 1;
+      likedVideos[id] = true;
+
+      setLiked(true);
+    }
+
+    localStorage.setItem(
+      'video_likes',
+      JSON.stringify(likesData)
+    );
+
+    localStorage.setItem(
+      'liked_videos',
+      JSON.stringify(likedVideos)
+    );
+
+    setLikes(likesData[id]);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -80,6 +134,13 @@ export const VideoPage: React.FC = () => {
     );
 
     setViews(viewsData[id]);
+    setLikes(getStoredLikes(id));
+
+    const likedVideos = JSON.parse(
+      localStorage.getItem('liked_videos') || '{}'
+    );
+
+    setLiked(!!likedVideos[id]);
   }, [id]);
 
   if (!video) {
@@ -201,7 +262,7 @@ export const VideoPage: React.FC = () => {
               {/* Action buttons */}
               <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap mt-4 sm:mt-0">
                 <button
-                  onClick={() => setLiked(!liked)}
+                  onClick={handleLike}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
                     padding: '8px 16px', borderRadius: 20,
@@ -213,7 +274,7 @@ export const VideoPage: React.FC = () => {
                   }}
                 >
                   <ThumbsUp style={{ width: 15, height: 15, fill: liked ? '#E50914' : 'none' }} />
-                  {liked ? '12,001' : '12K'}
+                  {formatViews(likes)}
                 </button>
                 <button style={{
                   display: 'flex', alignItems: 'center', gap: 6,
