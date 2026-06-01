@@ -11,7 +11,18 @@ export const VideoPage: React.FC = () => {
   const [video, setVideo] = useState<Video | null>(null);
   const [related, setRelated] = useState<Video[]>([]);
   const [liked, setLiked] = useState(false);
+  const [views, setViews] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const formatViews = (count: number) => {
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+    return count.toString();
+  };
+
+  const getStoredViews = (videoId: string) => {
+    const data = JSON.parse(localStorage.getItem('video_views') || '{}');
+    return data[videoId] || 0;
+  };
 
   useEffect(() => {
     if (id) {
@@ -22,6 +33,37 @@ export const VideoPage: React.FC = () => {
         window.scrollTo(0, 0);
       }
     }
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const viewedKey = `viewed_${id}`;
+    const viewed = localStorage.getItem(viewedKey);
+
+    const viewsData = JSON.parse(
+      localStorage.getItem('video_views') || '{}'
+    );
+
+    if (!viewsData[id]) {
+      viewsData[id] = Math.floor(Math.random() * 50000) + 500;
+    }
+
+    if (!viewed) {
+      viewsData[id] += 1;
+
+      localStorage.setItem(
+        viewedKey,
+        'true'
+      );
+
+      localStorage.setItem(
+        'video_views',
+        JSON.stringify(viewsData)
+      );
+    }
+
+    setViews(viewsData[id]);
   }, [id]);
 
   if (!video) {
@@ -123,7 +165,7 @@ export const VideoPage: React.FC = () => {
                     FreePlay Official
                   </p>
                   <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>
-                    1,2M subscribers
+                    {formatViews(views)} views
                   </p>
                 </div>
                 <button style={{
@@ -257,7 +299,12 @@ export const VideoPage: React.FC = () => {
                       fontFamily: 'Inter, sans-serif', fontSize: '0.72rem',
                       color: 'rgba(255,255,255,0.35)', margin: 0,
                     }}>
-                      FreePlay · 1.2K views
+                     FreePlay · {
+                       formatViews(
+                         getStoredViews(v.id) ||
+                         Math.floor(Math.random() * 50000) + 500
+                       )
+                     } views
                     </p>
                   </div>
                 </Link>
