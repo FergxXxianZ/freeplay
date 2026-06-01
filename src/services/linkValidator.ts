@@ -35,7 +35,10 @@ export const linkValidator = {
 
   /**
    * Test apakah video bisa di-fetch (accessible)
-   * Validasi: check Content-Type dan HTTP status
+   * Strategy: 
+   * - Jika response HTML dari freeplays.vercel.app → Video page exists = OK
+   * - Jika response video dari CDN → Check content-type
+   * - Jika 404/500 atau file error → Tidak OK
    */
   testVideoPlayback: async (url: string): Promise<{ playable: boolean; error?: string }> => {
     try {
@@ -51,29 +54,34 @@ export const linkValidator = {
 
       clearTimeout(timeoutId);
 
-      // Jika HEAD berhasil, check content-type
+      // Jika HEAD berhasil
       if (headResponse && headResponse.ok) {
         const contentType = headResponse.headers.get('content-type')?.toLowerCase() || '';
         const contentLength = headResponse.headers.get('content-length');
         
-        // Validasi: harus video dan ada content
-        if (!contentType.includes('video')) {
-          return { 
-            playable: false, 
-            error: `Invalid content-type: ${contentType || 'not set'}` 
-          };
+        // Case 1: HTML response = halaman video di website (video page exists)
+        if (contentType.includes('text/html')) {
+          return { playable: true }; // Website page = video ada di database
         }
         
-        // Jika content-type OK dan ada size, video valid
-        if (contentLength) {
-          const size = parseInt(contentLength);
-          if (size > 1000) { // Minimal 1KB
-            return { playable: true };
+        // Case 2: Video content-type
+        if (contentType.includes('video')) {
+          // Validasi: harus ada content atau minimal 1KB
+          if (contentLength) {
+            const size = parseInt(contentLength);
+            if (size > 1000) {
+              return { playable: true };
+            }
+          } else {
+            return { playable: true }; // No content-length but is video
           }
         }
         
-        // Jika HEAD OK tapi tidak ada content-length, anggap OK
-        return { playable: true };
+        // Case 3: Unknown type
+        return { 
+          playable: false, 
+          error: `Unknown content-type: ${contentType || 'not set'}` 
+        };
       }
 
       // HEAD gagal atau tidak OK, coba GET dengan Range
@@ -95,16 +103,21 @@ export const linkValidator = {
       if (getResponse.ok || getResponse.status === 206) {
         const contentType = getResponse.headers.get('content-type')?.toLowerCase() || '';
         
-        // Validasi content-type harus video
-        if (contentType && !contentType.includes('video')) {
-          return { 
-            playable: false, 
-            error: `Invalid content-type: ${contentType}` 
-          };
+        // HTML = video page exists
+        if (contentType.includes('text/html')) {
+          return { playable: true };
         }
         
-        // Status 200 atau 206 dengan video type = OK
-        return { playable: true };
+        // Video type = OK
+        if (contentType.includes('video')) {
+          return { playable: true };
+        }
+        
+        // Unknown type
+        return { 
+          playable: false, 
+          error: `Unknown content-type: ${contentType}` 
+        };
       }
 
       // Status bukan 200/206 = error
