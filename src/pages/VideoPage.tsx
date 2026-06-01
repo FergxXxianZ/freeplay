@@ -39,6 +39,29 @@ export const VideoPage: React.FC = () => {
     return data[videoId];
   };
 
+  const channels = [
+    'FreePlay Official',
+    'Videy Viral',
+    'Bokep Indo',
+    'Doodstream',
+    'Pemersatu Bangsa',
+    'Video Pemersatu',
+    'Videy Update',
+    'Dunia Malam',
+    'Bahan Colimu',
+    'Video Enak Enak'
+  ];
+
+  const getChannelName = (id: string) => {
+    let hash = 0;
+
+    for (let i = 0; i < id.length; i++) {
+      hash += id.charCodeAt(i);
+    }
+
+    return channels[hash % channels.length];
+  };
+
   const getStoredLikes = (videoId: string) => {
     const data = JSON.parse(
       localStorage.getItem('video_likes') || '{}'
@@ -239,7 +262,7 @@ export const VideoPage: React.FC = () => {
                 </div>
                 <div>
                   <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.9rem', color: '#fff', margin: 0 }}>
-                    FreePlay Official
+                    {video && getChannelName(video.id)}
                   </p>
                   <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>
                     {formatViews(views)} views
