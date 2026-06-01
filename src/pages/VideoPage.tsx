@@ -20,8 +20,22 @@ export const VideoPage: React.FC = () => {
   };
 
   const getStoredViews = (videoId: string) => {
-    const data = JSON.parse(localStorage.getItem('video_views') || '{}');
-    return data[videoId] || 0;
+    const data = JSON.parse(
+      localStorage.getItem('video_views') || '{}'
+    );
+
+    if (!data[videoId]) {
+      data[videoId] = Math.floor(
+        Math.random() * 50000
+      ) + 500;
+
+      localStorage.setItem(
+        'video_views',
+        JSON.stringify(data)
+      );
+    }
+
+    return data[videoId];
   };
 
   useEffect(() => {
@@ -38,30 +52,32 @@ export const VideoPage: React.FC = () => {
   useEffect(() => {
     if (!id) return;
 
-    const viewedKey = `viewed_${id}`;
-    const viewed = localStorage.getItem(viewedKey);
-
     const viewsData = JSON.parse(
       localStorage.getItem('video_views') || '{}'
     );
 
     if (!viewsData[id]) {
-      viewsData[id] = Math.floor(Math.random() * 50000) + 500;
+      viewsData[id] = Math.floor(
+        Math.random() * 50000
+      ) + 500;
     }
+
+    const viewedKey = `viewed_${id}`;
+    const viewed = sessionStorage.getItem(viewedKey);
 
     if (!viewed) {
       viewsData[id] += 1;
 
-      localStorage.setItem(
+      sessionStorage.setItem(
         viewedKey,
         'true'
       );
-
-      localStorage.setItem(
-        'video_views',
-        JSON.stringify(viewsData)
-      );
     }
+
+    localStorage.setItem(
+      'video_views',
+      JSON.stringify(viewsData)
+    );
 
     setViews(viewsData[id]);
   }, [id]);
@@ -299,12 +315,7 @@ export const VideoPage: React.FC = () => {
                       fontFamily: 'Inter, sans-serif', fontSize: '0.72rem',
                       color: 'rgba(255,255,255,0.35)', margin: 0,
                     }}>
-                     FreePlay · {
-                       formatViews(
-                         getStoredViews(v.id) ||
-                         Math.floor(Math.random() * 50000) + 500
-                       )
-                     } views
+                     FreePlay · {formatViews(getStoredViews(v.id))} views
                     </p>
                   </div>
                 </Link>
