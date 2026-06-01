@@ -6,14 +6,52 @@ export interface LinkCheckResult {
   id: string;
   video_url: string;
   isValid: boolean;
+  isPlayable: boolean; // NEW: Apakah video bisa diplay
   statusCode?: number;
   error?: string;
+  playbackError?: string; // NEW: Error saat playback
   checkedAt: string;
 }
 
 export const linkValidator = {
   /**
-   * Cek apakah link bisa diakses (HEAD request)
+   * Test apakah video bisa di-play dengan cara loading ke video element
+   */
+  testVideoPlayback: async (url: string): Promise<{ playable: boolean; error?: string }> => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      const timeout = setTimeout(() => {
+        video.src = '';
+        resolve({ playable: false, error: 'Playback test timeout' });
+      }, 10000); // 10 detik timeout
+
+      video.onloadedmetadata = () => {
+        clearTimeout(timeout);
+        video.src = '';
+        resolve({ playable: true });
+      };
+
+      video.onerror = () => {
+        clearTimeout(timeout);
+        const errorCode = video.error?.code;
+        let errorMsg = 'Unknown error';
+        
+        if (errorCode === 1) errorMsg = 'MEDIA_ERR_ABORTED';
+        if (errorCode === 2) errorMsg = 'MEDIA_ERR_NETWORK';
+        if (errorCode === 3) errorMsg = 'MEDIA_ERR_DECODE';
+        if (errorCode === 4) errorMsg = 'MEDIA_ERR_SRC_NOT_SUPPORTED';
+        
+        video.src = '';
+        resolve({ playable: false, error: errorMsg });
+      };
+
+      video.crossOrigin = 'anonymous';
+      video.src = url;
+    });
+  },
+
+  /**
+   * Cek apakah link bisa diakses (HEAD request) + test playback
    */
   checkLinkAccess: async (url: string): Promise<LinkCheckResult> => {
     const videoId = url.split('/').pop()?.replace('.mp4', '') || 'unknown';
@@ -30,11 +68,28 @@ export const linkValidator = {
 
       clearTimeout(timeoutId);
 
+      // Test playback jika HEAD request successful
+      let isPlayable = false;
+      let playbackError = undefined;
+
+      if (response.ok || response.status === 0) {
+        try {
+          const playbackResult = await linkValidator.testVideoPlayback(url);
+          isPlayable = playbackResult.playable;
+          playbackError = playbackResult.error;
+        } catch (playbackErr) {
+          isPlayable = false;
+          playbackError = 'Playback test failed';
+        }
+      }
+
       return {
         id: videoId,
         video_url: url,
-        isValid: response.ok || response.status === 0, // 0 untuk no-cors
+        isValid: response.ok || response.status === 0,
+        isPlayable: isPlayable,
         statusCode: response.status,
+        playbackError: playbackError,
         checkedAt: new Date().toISOString(),
       };
     } catch (error) {
@@ -42,6 +97,7 @@ export const linkValidator = {
         id: videoId,
         video_url: url,
         isValid: false,
+        isPlayable: false,
         error: error instanceof Error ? error.message : 'Unknown error',
         checkedAt: new Date().toISOString(),
       };
@@ -89,9 +145,16 @@ export const linkValidator = {
   },
 
   /**
-   * Dapatkan links yang tidak valid
+   * Dapatkan links yang tidak valid atau tidak bisa diplay
    */
   getInvalidLinks: (results: LinkCheckResult[]): LinkCheckResult[] => {
-    return results.filter(r => !r.isValid);
+    return results.filter(r => !r.isValid || !r.isPlayable);
+  },
+
+  /**
+   * Dapatkan hanya links yang tidak bisa diplay (tapi HTTP valid)
+   */
+  getNonPlayableLinks: (results: LinkCheckResult[]): LinkCheckResult[] => {
+    return results.filter(r => r.isValid && !r.isPlayable);
   },
 };

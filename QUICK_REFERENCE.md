@@ -42,11 +42,12 @@ useEffect(() => {
 ## 📋 Fitur Utama
 
 ### ✨ **Dashboard Admin** (`/admin/links`)
-- 📊 Lihat statistik link (total, valid, rusak, kesehatan%)
-- 🔍 Cek status semua link dengan satu klik
+- 📊 Lihat statistik link (total, bisa diplay, valid, tidak bisa diplay, kesehatan%)
+- 🔍 Cek status semua link + test playback dengan satu klik
+- 🎬 **NEW:** Test apakah video benar-benar bisa diplay (bukan hanya link check)
 - ✏️ Edit link video dengan mudah
 - 🗑️ Hapus video individual atau batch
-- 🎯 Filter berdasarkan status (Valid/Rusak)
+- 🎯 Filter berdasarkan status (Bisa Diplay / Tidak Bisa / Error)
 - 💾 Export data sebagai JSON
 - 🎨 UI modern dengan animasi
 
@@ -67,42 +68,50 @@ useEffect(() => {
 
 ## 💡 Use Cases
 
-### ✅ **Use Case 1: Link Eror / Tidak Bisa Diplay**
+### ✅ **Use Case 1: Video Tidak Bisa Diplay**
 ```
 1. Buka http://localhost:5173/admin/links
 2. Klik "Cek Semua Link"
-3. Lihat video mana yang rusak (❌ Rusak)
-4. Edit link ke URL yang benar
+3. Lihat status:
+   - ✓ Bisa Diplay = OK, keep
+   - ⚠ Tidak Bisa Diplay = Problem, perlu fix/hapus
+   - ✗ Link Error = Dead link, hapus
+4. Edit link ke URL yang bisa diplay ATAU hapus
 5. Klik "Simpan"
-✅ Selesai, link sudah diperbaiki!
+✅ Selesai, video sudah di-fix atau dihapus!
 ```
 
-### ✅ **Use Case 2: Auto Remove Broken Links**
+### ✅ **Use Case 2: Batch Delete Non-Playable Videos**
 ```
-1. Setup auto-cleanup di App.tsx (langkah #3 setup)
-2. Aplikasi akan otomatis cek setiap 60 menit
-3. Video dengan link rusak akan dihapus otomatis
-4. Log disimpan ke localStorage
-✅ Set & forget, semuanya otomatis!
+1. Buka /admin/links
+2. Klik "Cek Semua Link"
+3. Tunggu selesai → lihat berapa yang "⚠ Tidak Bisa" atau "✗ Error"
+4. Klik "Hapus Tidak Bisa Diplay (X)" - X = jumlah yang tidak bisa
+5. Konfirmasi
+✅ Semua video yang tidak bisa diplay/error dihapus otomatis!
 ```
 
 ### ✅ **Use Case 3: Batch Delete Broken Videos**
 ```
 1. Buka /admin/links
 2. Klik "Cek Semua Link"
-3. Tunggu hasil (itu tunggu beberapa detik)
-4. Klik "Hapus Link Rusak (X)" - X = jumlah yang rusak
-5. Konfirmasi penghapusan
-✅ Semua video dengan link rusak terhapus sekaligus!
+3. Tunggu hasil
+4. Filter: Pilih "⚠ Tidak Bisa" atau "✗ Error"
+5. Klik "Hapus Tidak Bisa Diplay (X)"
+6. Konfirmasi penghapusan
+✅ Semua video dengan problem terhapus sekaligus!
 ```
 
 ### ✅ **Use Case 4: Backup & Monitor**
 ```
 // Di browser console:
 
-// Lihat statistik
+// Lihat statistik kesehatan (termasuk playable)
 const report = await autoCleanupService.validateAndReport(videoData);
-console.log(`Health: ${report.summary.healthPercentage}%`);
+console.log(`Bisa Diplay: ${report.summary.playable}/${report.summary.total}`);
+
+// Lihat video yang tidak bisa diplay
+console.log(report.nonPlayableVideos);
 
 // Lihat log cleanup terakhir
 console.log(autoCleanupService.getCleanupLog());
@@ -117,8 +126,8 @@ const backup = autoCleanupService.restoreFromBackup();
 
 | Aksi | Cara |
 |------|------|
-| Cek semua link | Tombol "Cek Semua Link" (biru) |
-| Hapus link rusak | Tombol "Hapus Link Rusak" (merah) |
+| Cek semua link + playback | Tombol "Cek Semua Link" (biru) |
+| Hapus tidak bisa diplay | Tombol "Hapus Tidak Bisa Diplay" (merah) |
 | Export data | Tombol "Export JSON" (ungu) |
 | Edit link | Klik ✏️ pada video |
 | Hapus video | Klik 🗑️ pada video |

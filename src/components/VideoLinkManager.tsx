@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Video } from '../types';
 import videoData from '../data/videos.json';
 import { linkValidator, LinkCheckResult } from '../services/linkValidator';
-import { Edit2, Trash2, Check, X, Loader, RefreshCw, Download } from 'lucide-react';
+import { Edit2, Trash2, Check, X, Loader, RefreshCw, Download, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface VideoWithStatus extends Video {
   linkStatus?: LinkCheckResult;
+  isPlayableChecked?: boolean;
 }
 
 export const VideoLinkManager: React.FC = () => {
@@ -15,7 +16,7 @@ export const VideoLinkManager: React.FC = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editUrl, setEditUrl] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'valid' | 'invalid'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'playable' | 'non-playable' | 'error'>('all');
 
   /**
    * Cek semua link
@@ -70,22 +71,31 @@ export const VideoLinkManager: React.FC = () => {
   };
 
   /**
-   * Hapus semua link yang invalid/rusak
+   * Hapus semua link yang invalid/rusak atau tidak bisa diplay
    */
   const handleAutoCleanup = async () => {
     const invalidLinks = linkValidator.getInvalidLinks(checkResults);
+    const nonPlayableLinks = linkValidator.getNonPlayableLinks(checkResults);
     
     if (invalidLinks.length === 0) {
-      alert('Tidak ada link yang rusak');
+      alert('Tidak ada video yang perlu dihapus');
       return;
     }
 
-    if (confirm(`Hapus ${invalidLinks.length} video dengan link rusak?`)) {
+    let message = `Hapus ${invalidLinks.length} video?\n\n`;
+    if (nonPlayableLinks.length > 0) {
+      message += `- ${nonPlayableLinks.length} video tidak bisa diplay\n`;
+    }
+    if (invalidLinks.length - nonPlayableLinks.length > 0) {
+      message += `- ${invalidLinks.length - nonPlayableLinks.length} link error\n`;
+    }
+
+    if (confirm(message)) {
       const invalidUrls = invalidLinks.map(l => l.video_url);
       const cleanedVideos = videos.filter(v => !invalidUrls.includes(v.video_url));
       
       setVideos(cleanedVideos);
-      setCheckResults(checkResults.filter(r => r.isValid));
+      setCheckResults(checkResults.filter(r => r.isValid && r.isPlayable));
       localStorage.setItem('videos_data', JSON.stringify(cleanedVideos));
       alert(`${invalidLinks.length} video berhasil dihapus`);
     }
@@ -109,13 +119,15 @@ export const VideoLinkManager: React.FC = () => {
    */
   const filteredVideos = videos.filter(v => {
     if (filterStatus === 'all') return true;
-    if (filterStatus === 'valid') return v.linkStatus?.isValid !== false;
-    if (filterStatus === 'invalid') return v.linkStatus?.isValid === false;
+    if (filterStatus === 'playable') return v.linkStatus?.isPlayable === true;
+    if (filterStatus === 'non-playable') return v.linkStatus?.isValid && !v.linkStatus?.isPlayable;
+    if (filterStatus === 'error') return !v.linkStatus?.isValid;
     return true;
   });
 
-  const invalidCount = checkResults.filter(r => !r.isValid).length;
+  const invalidCount = checkResults.filter(r => !r.isValid || !r.isPlayable).length;
   const validCount = checkResults.filter(r => r.isValid).length;
+  const playableCount = checkResults.filter(r => r.isPlayable).length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black p-6">
@@ -131,7 +143,7 @@ export const VideoLinkManager: React.FC = () => {
         </motion.div>
 
         {/* Stats & Controls */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -147,6 +159,16 @@ export const VideoLinkManager: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="bg-gradient-to-br from-green-600 to-green-700 rounded-lg p-4 text-white"
           >
+            <p className="text-sm opacity-90 mb-1">Bisa Diplay</p>
+            <p className="text-3xl font-bold">{playableCount}</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.15 }}
+            className="bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-lg p-4 text-white"
+          >
             <p className="text-sm opacity-90 mb-1">Link Valid</p>
             <p className="text-3xl font-bold">{validCount}</p>
           </motion.div>
@@ -157,7 +179,7 @@ export const VideoLinkManager: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="bg-gradient-to-br from-red-600 to-red-700 rounded-lg p-4 text-white"
           >
-            <p className="text-sm opacity-90 mb-1">Link Rusak</p>
+            <p className="text-sm opacity-90 mb-1">Tidak Bisa Diplay</p>
             <p className="text-3xl font-bold">{invalidCount}</p>
           </motion.div>
 
@@ -169,7 +191,7 @@ export const VideoLinkManager: React.FC = () => {
           >
             <p className="text-sm opacity-90 mb-1">Kesehatan</p>
             <p className="text-3xl font-bold">
-              {videos.length > 0 ? Math.round((validCount / videos.length) * 100) : 0}%
+              {videos.length > 0 ? Math.round((playableCount / videos.length) * 100) : 0}%
             </p>
           </motion.div>
         </div>
@@ -200,7 +222,7 @@ export const VideoLinkManager: React.FC = () => {
             className="flex items-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg transition"
           >
             <Trash2 className="w-5 h-5" />
-            Hapus Link Rusak ({invalidCount})
+            Hapus Tidak Bisa Diplay ({invalidCount})
           </button>
 
           <button
@@ -213,8 +235,8 @@ export const VideoLinkManager: React.FC = () => {
         </motion.div>
 
         {/* Filter */}
-        <div className="flex gap-3 mb-8">
-          {(['all', 'valid', 'invalid'] as const).map(status => (
+        <div className="flex gap-3 mb-8 flex-wrap">
+          {(['all', 'playable', 'non-playable', 'error'] as const).map(status => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
@@ -225,8 +247,9 @@ export const VideoLinkManager: React.FC = () => {
               }`}
             >
               {status === 'all' && 'Semua'}
-              {status === 'valid' && '✓ Valid'}
-              {status === 'invalid' && '✗ Rusak'}
+              {status === 'playable' && '✓ Bisa Diplay'}
+              {status === 'non-playable' && '⚠ Tidak Bisa'}
+              {status === 'error' && '✗ Error'}
             </button>
           ))}
         </div>
@@ -269,20 +292,28 @@ export const VideoLinkManager: React.FC = () => {
                   <div className="md:col-span-2">
                     {video.linkStatus ? (
                       <div className="flex items-center gap-2">
-                        {video.linkStatus.isValid ? (
+                        {video.linkStatus.isPlayable ? (
                           <>
                             <Check className="w-5 h-5 text-green-500" />
-                            <span className="text-green-500 text-sm">Valid</span>
+                            <span className="text-green-500 text-sm font-semibold">✓ Bisa Diplay</span>
+                          </>
+                        ) : video.linkStatus.isValid && !video.linkStatus.isPlayable ? (
+                          <>
+                            <AlertCircle className="w-5 h-5 text-orange-500" />
+                            <span className="text-orange-500 text-sm font-semibold">⚠ Tidak Bisa Diplay</span>
                           </>
                         ) : (
                           <>
                             <X className="w-5 h-5 text-red-500" />
-                            <span className="text-red-500 text-sm">Rusak</span>
+                            <span className="text-red-500 text-sm font-semibold">✗ Link Error</span>
                           </>
                         )}
                       </div>
                     ) : (
                       <span className="text-gray-400 text-sm">Belum cek</span>
+                    )}
+                    {video.linkStatus?.playbackError && (
+                      <p className="text-xs text-orange-400 mt-1">{video.linkStatus.playbackError}</p>
                     )}
                   </div>
 

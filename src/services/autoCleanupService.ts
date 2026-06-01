@@ -3,18 +3,18 @@ import videoData from '../data/videos.json';
 import { linkValidator, LinkCheckResult } from './linkValidator';
 
 /**
- * Service untuk auto-cleanup link yang rusak
+ * Service untuk auto-cleanup link yang rusak atau tidak bisa diplay
  * Dapat dijalankan secara berkala/otomatis
  */
 export const autoCleanupService = {
   /**
-   * Check dan auto-remove video dengan link rusak
+   * Check dan auto-remove video dengan link rusak atau tidak bisa diplay
    * @param maxAgeMinutes - waktu cache validasi sebelum di-recheck
    */
   autoRemoveBrokenLinks: async (
     videos: Video[],
     maxAgeMinutes: number = 60
-  ): Promise<{ removed: Video[]; remaining: Video[] }> => {
+  ): Promise<{ removed: Video[]; remaining: Video[]; invalidLinks: LinkCheckResult[]; nonPlayableLinks: LinkCheckResult[] }> => {
     // Ambil cache atau lakukan check baru
     let checkResults = linkValidator.getLinkCheckCache(maxAgeMinutes);
     
@@ -24,13 +24,15 @@ export const autoCleanupService = {
       linkValidator.saveLinkCheckCache(checkResults);
     }
 
+    // Dapatkan links yang invalid atau tidak bisa diplay
     const invalidResults = linkValidator.getInvalidLinks(checkResults);
+    const nonPlayableResults = linkValidator.getNonPlayableLinks(checkResults);
     const invalidUrls = invalidResults.map(r => r.video_url);
 
     const removed = videos.filter(v => invalidUrls.includes(v.video_url));
     const remaining = videos.filter(v => !invalidUrls.includes(v.video_url));
 
-    return { removed, remaining };
+    return { removed, remaining, invalidLinks: invalidResults, nonPlayableLinks: nonPlayableResults };
   },
 
   /**
@@ -91,35 +93,48 @@ export const autoCleanupService = {
    * Validate link dan tampilkan hasil detail
    */
   validateAndReport: async (videos: Video[]): Promise<{
-    summary: { total: number; valid: number; invalid: number; healthPercentage: number };
-    invalidVideos: Array<Video & { error?: string }>;
+    summary: { total: number; valid: number; playable: number; nonPlayable: number; invalid: number; healthPercentage: number };
+    invalidVideos: Array<Video & { error?: string; playbackError?: string }>;
+    nonPlayableVideos: Array<Video & { playbackError?: string }>;
     validVideos: Video[];
   }> => {
     const urls = videos.map(v => v.video_url);
     const results = await linkValidator.checkMultipleLinks(urls);
 
     const validResults = results.filter(r => r.isValid);
-    const invalidResults = results.filter(r => !r.isValid);
+    const playableResults = results.filter(r => r.isPlayable);
+    const nonPlayableResults = linkValidator.getNonPlayableLinks(results);
+    const invalidResults = linkValidator.getInvalidLinks(results);
 
     const validVideos = videos.filter(v =>
       validResults.some(r => r.video_url === v.video_url)
     );
 
+    const nonPlayableVideos = videos.filter(v =>
+      nonPlayableResults.some(r => r.video_url === v.video_url)
+    ).map((video, idx) => {
+      const error = nonPlayableResults.find(r => r.video_url === video.video_url);
+      return { ...video, playbackError: error?.playbackError };
+    });
+
     const invalidVideos = videos.filter(v =>
       invalidResults.some(r => r.video_url === v.video_url)
     ).map((video, idx) => {
-      const error = invalidResults.find(r => r.video_url === video.video_url)?.error;
-      return { ...video, error };
+      const error = invalidResults.find(r => r.video_url === video.video_url);
+      return { ...video, error: error?.error, playbackError: error?.playbackError };
     });
 
     return {
       summary: {
         total: videos.length,
         valid: validResults.length,
+        playable: playableResults.length,
+        nonPlayable: nonPlayableResults.length,
         invalid: invalidResults.length,
-        healthPercentage: videos.length > 0 ? Math.round((validResults.length / videos.length) * 100) : 0,
+        healthPercentage: videos.length > 0 ? Math.round((playableResults.length / videos.length) * 100) : 0,
       },
       invalidVideos,
+      nonPlayableVideos,
       validVideos,
     };
   },
