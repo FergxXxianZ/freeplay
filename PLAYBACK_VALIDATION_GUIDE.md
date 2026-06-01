@@ -28,7 +28,7 @@ Link tidak bisa diakses = ✗ Link Error
 - **Solusi:** Sistem akan mendeteksi ini sebagai "⚠ Tidak Bisa Diplay" dan bisa dihapus otomatis
 
 ### **Link Alternatif yang Bekerja**
-- URL: `https://freeplays.vercel.app/FPdVFIps1`
+- URL: `https://freeplays.vercel.app/video/FPdVFIps1`
 - Status: Video bisa diplay
 - **Hasil:** Ditandai sebagai "✓ Bisa Diplay"
 

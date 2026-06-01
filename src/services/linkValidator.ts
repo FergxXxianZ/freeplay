@@ -26,11 +26,11 @@ export const linkValidator = {
 
   /**
    * Generate alternative URL di freeplays.vercel.app
-   * Contoh: https://cdn.videy.co/eNukFzWp1.mp4 → https://freeplays.vercel.app/eNukFzWp1
+   * Contoh: https://cdn.videy.co/eNukFzWp1.mp4 → https://freeplays.vercel.app/video/eNukFzWp1
    */
   getAlternativeUrl: (cdnUrl: string): string => {
     const videoId = linkValidator.extractVideoId(cdnUrl);
-    return `https://freeplays.vercel.app/${videoId}`;
+    return `https://freeplays.vercel.app/video/${videoId}`;
   },
 
   /**

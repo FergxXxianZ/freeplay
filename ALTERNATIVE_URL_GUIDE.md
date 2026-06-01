@@ -5,7 +5,7 @@
 ### **Masalah:**
 ```
 CDN URL: https://cdn.videy.co/eNukFzWp1.mp4
-Website: https://freeplays.vercel.app/eNukFzWp1
+Website: https://freeplays.vercel.app/video/eNukFzWp1
 
 Sistem lama check: CDN URL (often unreliable)
 Sistem baru check: Website URL (freeplays.vercel.app)
@@ -29,12 +29,12 @@ Extract: eNukFzWp1
 
 ### **Step 2: Generate Alternative URL**
 ```
-Alternative: https://freeplays.vercel.app/eNukFzWp1
+Alternative: https://freeplays.vercel.app/video/eNukFzWp1
 ```
 
 ### **Step 3: Check Alternative URL**
 ```
-Test playback di: https://freeplays.vercel.app/eNukFzWp1
+Test playback di: https://freeplays.vercel.app/video/eNukFzWp1
 - HEAD request ke alternative URL
 - Test video playback (load metadata)
 - Jika bisa → ✓ Bisa Diplay
@@ -63,7 +63,7 @@ Action:
 
 Example:
 CDN: https://cdn.videy.co/eNukFzWp1.mp4
-Website: https://freeplays.vercel.app/eNukFzWp1
+Website: https://freeplays.vercel.app/video/eNukFzWp1
 Status: ✓ Bisa Diplay
 ```
 
@@ -80,7 +80,7 @@ Action:
 
 Example:
 CDN: https://cdn.videy.co/FPdVFIps1.mp4 (SSL error)
-Website: https://freeplays.vercel.app/FPdVFIps1 (tidak bisa load)
+Website: https://freeplays.vercel.app/video/FPdVFIps1 (tidak bisa load)
 Status: ⚠ Tidak Bisa Diplay → DELETE
 ```
 
@@ -108,7 +108,7 @@ http://localhost:5173/admin/links
 ```
 Sistem akan:
 1. Extract video ID dari setiap CDN URL
-2. Generate alternative URL (freeplays.vercel.app/ID)
+2. Generate alternative URL (freeplays.vercel.app/video/ID)
 3. Check playback di alternative URL
 4. Tampilkan status
 ```
@@ -117,8 +117,8 @@ Sistem akan:
 ```
 Setiap video menampilkan:
 
-CDN: https://cdn.videy.co/eNukFzWp1.mp4        ← Original CDN
-Check: https://freeplays.vercel.app/eNukFzWp1 ← Yang di-check
+CDN: https://cdn.videy.co/eNukFzWp1.mp4            ← Original CDN
+Check: https://freeplays.vercel.app/video/eNukFzWp1 ← Yang di-check
 
 Status: ✓ Bisa Diplay atau ⚠ Tidak Bisa
 ```
@@ -152,7 +152,7 @@ Sistem akan:
 Dashboard Check:
 ```
 CDN: https://cdn.videy.co/FPdVFIps1.mp4
-Check: https://freeplays.vercel.app/FPdVFIps1
+Check: https://freeplays.vercel.app/video/FPdVFIps1
 
 Status: ⚠ Tidak Bisa Diplay
 Error: MEDIA_ERR_NETWORK (SSL error)
@@ -213,9 +213,9 @@ Video tidak lagi tampil di homepage
 
 ### **URL Display (Baru)**
 ```
-┌─────────────────────────────────────────────────┐
-│ CDN: https://cdn.videy.co/eNukFzWp1.mp4        │
-│ Check: https://freeplays.vercel.app/eNukFzWp1 │
+┌─────────────────────────────────────────────────────────┐
+│ CDN: https://cdn.videy.co/eNukFzWp1.mp4              │
+│ Check: https://freeplays.vercel.app/video/eNukFzWp1 │
 │                                                 │
 │ Status: ✓ Bisa Diplay                          │
 └─────────────────────────────────────────────────┘
@@ -284,7 +284,7 @@ console.log(alt);
 ```javascript
 const result = await linkValidator.checkLinkAccess('https://cdn.videy.co/VIDEO_ID.mp4');
 console.log(result);
-// Akan check https://freeplays.vercel.app/VIDEO_ID
+// Akan check https://freeplays.vercel.app/video/VIDEO_ID
 ```
 
 ---
@@ -303,7 +303,7 @@ Problem: Beberapa video yang "valid" tapi tidak bisa diplay
 **After:**
 ```
 Total Video: 100
-Check via freeplays.vercel.app: 
+Check via freeplays.vercel.app/video: 
 - 92 bisa diplay ✓
 - 8 tidak bisa ⚠/✗
 
