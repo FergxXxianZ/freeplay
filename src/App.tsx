@@ -1,10 +1,18 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { HomePage } from './pages/HomePage';
 import { VideoPage } from './pages/VideoPage';
+import { AdminLinksPage } from './pages/AdminLinksPage';
+import { autoCleanupService } from './services/autoCleanupService';
 import { Play } from 'lucide-react';
 
 export default function App() {
+  useEffect(() => {
+    const stopCleanup = autoCleanupService.startAutoCleanupInterval(60);
+    return () => stopCleanup();
+  }, []);
+  
   return (
     <Router>
       <div style={{ minHeight: '100vh', background: '#141414', color: '#e5e5e5', fontFamily: 'Inter, sans-serif' }}>
@@ -14,6 +22,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/page/:pageNumber" element={<HomePage />} />
             <Route path="/video/:id" element={<VideoPage />} />
+            <Route path="/admin/links" element={<AdminLinksPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
