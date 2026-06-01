@@ -35,36 +35,83 @@ export const linkValidator = {
 
   /**
    * Test apakah video bisa di-fetch (accessible)
-   * Menggunakan fetch dengan Range header untuk check stream availability
+   * Validasi: check Content-Type dan HTTP status
    */
   testVideoPlayback: async (url: string): Promise<{ playable: boolean; error?: string }> => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      // Try fetching dengan Range request (untuk streaming support)
-      const response = await fetch(url, {
+      // Try HEAD request first untuk cek header tanpa download content
+      const headResponse = await fetch(url, {
+        method: 'HEAD',
+        mode: 'cors',
+        signal: controller.signal,
+      }).catch(() => null); // Jika HEAD gagal, lanjut ke GET
+
+      clearTimeout(timeoutId);
+
+      // Jika HEAD berhasil, check content-type
+      if (headResponse && headResponse.ok) {
+        const contentType = headResponse.headers.get('content-type')?.toLowerCase() || '';
+        const contentLength = headResponse.headers.get('content-length');
+        
+        // Validasi: harus video dan ada content
+        if (!contentType.includes('video')) {
+          return { 
+            playable: false, 
+            error: `Invalid content-type: ${contentType || 'not set'}` 
+          };
+        }
+        
+        // Jika content-type OK dan ada size, video valid
+        if (contentLength) {
+          const size = parseInt(contentLength);
+          if (size > 1000) { // Minimal 1KB
+            return { playable: true };
+          }
+        }
+        
+        // Jika HEAD OK tapi tidak ada content-length, anggap OK
+        return { playable: true };
+      }
+
+      // HEAD gagal atau tidak OK, coba GET dengan Range
+      const controller2 = new AbortController();
+      const timeoutId2 = setTimeout(() => controller2.abort(), 5000);
+
+      const getResponse = await fetch(url, {
         method: 'GET',
         headers: {
           'Range': 'bytes=0-1', // Request hanya 1 byte untuk test
         },
         mode: 'cors',
-        signal: controller.signal,
+        signal: controller2.signal,
       });
 
-      clearTimeout(timeoutId);
+      clearTimeout(timeoutId2);
 
-      // Status 200, 206 (Partial Content), atau 302 (redirect) semua OK
-      const isPlayable = response.ok || response.status === 206 || response.status === 302;
-      
-      if (isPlayable) {
+      // Check GET response
+      if (getResponse.ok || getResponse.status === 206) {
+        const contentType = getResponse.headers.get('content-type')?.toLowerCase() || '';
+        
+        // Validasi content-type harus video
+        if (contentType && !contentType.includes('video')) {
+          return { 
+            playable: false, 
+            error: `Invalid content-type: ${contentType}` 
+          };
+        }
+        
+        // Status 200 atau 206 dengan video type = OK
         return { playable: true };
-      } else {
-        return { 
-          playable: false, 
-          error: `HTTP ${response.status}` 
-        };
       }
+
+      // Status bukan 200/206 = error
+      return { 
+        playable: false, 
+        error: `HTTP ${getResponse.status}` 
+      };
     } catch (error) {
       return {
         playable: false,
