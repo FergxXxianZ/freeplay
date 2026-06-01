@@ -182,8 +182,22 @@ export const VideoPage: React.FC = () => {
     );
   }
 
-  const isSecureUrl = video.video_url.startsWith('https://vid30s.com/') || video.video_url.startsWith('https://assets.vid4me.com/') || video.video_url.startsWith('https://interstitial.slicedrive.com/') || video.video_url.startsWith('https://cdn2.slicedrive.com/') || video.video_url.startsWith('https://media.slicedrive.com/') || video.video_url.startsWith('https://cdn.videy.co/') || video.video_url.startsWith('https://cdn2.videy.co/') || video.video_url.startsWith('https://videy.co/');
+  {/*UNTUK TAMBAH DOMAIN*/}
+  const allowedDomains = [
+    'https://vid30s.com/',
+    'https://assets.vid4me.com/',
+    'https://interstitial.slicedrive.com/',
+    'https://cdn2.slicedrive.com/',
+    'https://media.slicedrive.com/',
+    'https://cdn.videy.co/',
+    'https://cdn2.videy.co/',
+    'https://videy.co/'
+  ];
 
+  const isSecureUrl = allowedDomains.some(domain =>
+    video.video_url.startsWith(domain)
+  );
+  
   return (
     <div className="mx-auto px-4 sm:px-6 md:px-8 py-6 pb-16" style={{ maxWidth: 1400 }}>
 
