@@ -281,6 +281,10 @@ export const VideoPage: React.FC = () => {
                     {video && getChannelName(video.id)}
                   </p>
                 </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap mt-4 sm:mt-0">
                 <button style={{
                   padding: '7px 18px',
                   background: '#fff', color: '#141414',
@@ -293,10 +297,6 @@ export const VideoPage: React.FC = () => {
                 >
                   Subscribe
                 </button>
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap mt-4 sm:mt-0">
                 <button
                   onClick={handleLike}
                   style={{
