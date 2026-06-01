@@ -139,7 +139,7 @@ export const VideoLinkManager: React.FC = () => {
           className="mb-8"
         >
           <h1 className="text-4xl font-bold text-white mb-2">Video Link Manager</h1>
-          <p className="text-gray-400">Kelola dan validasi semua link video Anda</p>
+          <p className="text-gray-400">Validasi video via freeplays.vercel.app - Hapus otomatis jika tidak bisa diplay</p>
         </motion.div>
 
         {/* Stats & Controls */}
@@ -284,7 +284,16 @@ export const VideoLinkManager: React.FC = () => {
                         placeholder="Masukkan URL baru..."
                       />
                     ) : (
-                      <p className="text-gray-300 text-sm truncate">{video.video_url}</p>
+                      <div>
+                        <p className="text-gray-300 text-sm truncate" title={video.video_url}>
+                          CDN: {video.video_url}
+                        </p>
+                        {video.linkStatus?.alternativeUrl && (
+                          <p className="text-blue-300 text-xs truncate mt-1" title={video.linkStatus.alternativeUrl}>
+                            Check: {video.linkStatus.alternativeUrl}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
 

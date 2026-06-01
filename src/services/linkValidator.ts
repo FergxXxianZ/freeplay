@@ -5,15 +5,34 @@
 export interface LinkCheckResult {
   id: string;
   video_url: string;
+  alternativeUrl?: string; // URL freeplays.vercel.app yang di-check
   isValid: boolean;
-  isPlayable: boolean; // NEW: Apakah video bisa diplay
+  isPlayable: boolean; // Apakah video bisa diplay di alternative URL
   statusCode?: number;
   error?: string;
-  playbackError?: string; // NEW: Error saat playback
+  playbackError?: string; // Error saat playback
   checkedAt: string;
 }
 
 export const linkValidator = {
+  /**
+   * Extract video ID dari URL CDN
+   * Contoh: https://cdn.videy.co/eNukFzWp1.mp4 → eNukFzWp1
+   */
+  extractVideoId: (url: string): string => {
+    const match = url.match(/\/([a-zA-Z0-9]+)\.mp4$/);
+    return match ? match[1] : url.split('/').pop()?.replace('.mp4', '') || 'unknown';
+  },
+
+  /**
+   * Generate alternative URL di freeplays.vercel.app
+   * Contoh: https://cdn.videy.co/eNukFzWp1.mp4 → https://freeplays.vercel.app/eNukFzWp1
+   */
+  getAlternativeUrl: (cdnUrl: string): string => {
+    const videoId = linkValidator.extractVideoId(cdnUrl);
+    return `https://freeplays.vercel.app/${videoId}`;
+  },
+
   /**
    * Test apakah video bisa di-play dengan cara loading ke video element
    */
@@ -51,43 +70,57 @@ export const linkValidator = {
   },
 
   /**
-   * Cek apakah link bisa diakses (HEAD request) + test playback
+   * Cek apakah link CDN bisa diakses dan test playback di freeplays.vercel.app
+   * Strategy: Check alternative URL (freeplays.vercel.app) bukan CDN asli
    */
   checkLinkAccess: async (url: string): Promise<LinkCheckResult> => {
-    const videoId = url.split('/').pop()?.replace('.mp4', '') || 'unknown';
+    const videoId = linkValidator.extractVideoId(url);
+    const alternativeUrl = linkValidator.getAlternativeUrl(url);
     
     try {
+      // Step 1: Check apakah alternative URL accessible
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 detik timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const response = await fetch(url, {
+      const response = await fetch(alternativeUrl, {
         method: 'HEAD',
-        mode: 'no-cors',
+        mode: 'cors',
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
-      // Test playback jika HEAD request successful
+      // Step 2: Test playback pada alternative URL jika accessible
       let isPlayable = false;
       let playbackError = undefined;
 
       if (response.ok || response.status === 0) {
         try {
-          const playbackResult = await linkValidator.testVideoPlayback(url);
+          const playbackResult = await linkValidator.testVideoPlayback(alternativeUrl);
           isPlayable = playbackResult.playable;
           playbackError = playbackResult.error;
         } catch (playbackErr) {
           isPlayable = false;
           playbackError = 'Playback test failed';
         }
+      } else if (response.status !== 0) {
+        // Alternative URL tidak accessible, coba test playback langsung
+        try {
+          const playbackResult = await linkValidator.testVideoPlayback(alternativeUrl);
+          isPlayable = playbackResult.playable;
+          playbackError = playbackResult.error;
+        } catch (playbackErr) {
+          isPlayable = false;
+          playbackError = `HTTP ${response.status}: ${playbackErr instanceof Error ? playbackErr.message : 'Unknown error'}`;
+        }
       }
 
       return {
         id: videoId,
-        video_url: url,
+        video_url: url, // Keep original CDN URL
+        alternativeUrl: alternativeUrl,
         isValid: response.ok || response.status === 0,
-        isPlayable: isPlayable,
+        isPlayable: isPlayable, // Check hasil dari alternative URL
         statusCode: response.status,
         playbackError: playbackError,
         checkedAt: new Date().toISOString(),
@@ -96,6 +129,7 @@ export const linkValidator = {
       return {
         id: videoId,
         video_url: url,
+        alternativeUrl: alternativeUrl,
         isValid: false,
         isPlayable: false,
         error: error instanceof Error ? error.message : 'Unknown error',
