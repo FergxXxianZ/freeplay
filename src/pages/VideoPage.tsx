@@ -265,9 +265,6 @@ export const VideoPage: React.FC = () => {
                   <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '0.9rem', color: '#fff', margin: 0 }}>
                     {video && getChannelName(video.id)}
                   </p>
-                  <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', margin: '2px 0 0' }}>
-                    {formatViews(views)} views
-                  </p>
                 </div>
                 <button style={{
                   padding: '7px 18px',
