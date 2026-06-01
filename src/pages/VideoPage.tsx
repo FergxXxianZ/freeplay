@@ -3,8 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import { videoService } from '../services/videoService';
 import { Video } from '../types';
 import { VideoCard } from '../components/VideoCard';
-import { ChevronLeft, Share2, ThumbsUp, Plus } from 'lucide-react';
+import { ChevronLeft, Share2, ThumbsUp, Eye, Play} from 'lucide-react';
 import { motion } from 'motion/react';
+import { Eye } from 'lucide-react';
+
 export const VideoPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [video, setVideo] = useState<Video | null>(null);
@@ -306,6 +308,7 @@ export const VideoPage: React.FC = () => {
                   onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.14)')}
                   onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)')}
                 >
+                  <Eye style={{ width: 15, height: 15 }} />
                   {formatViews(views)} views
                 </button>
                 <button style={{
