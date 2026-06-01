@@ -185,6 +185,7 @@ export const VideoPage: React.FC = () => {
   {/*UNTUK TAMBAH DOMAIN*/}
   const allowedDomains = [
     'https://vid30s.com/',
+    'https://cdn2.slirpdrive.com/', 
     'https://assets.vid4me.com/',
     'https://interstitial.slicedrive.com/',
     'https://cdn2.slicedrive.com/',
