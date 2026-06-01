@@ -34,95 +34,64 @@ export const linkValidator = {
   },
 
   /**
-   * Test apakah video bisa di-play dengan cara loading ke video element
+   * Test apakah video bisa di-fetch (accessible)
+   * Menggunakan fetch dengan Range header untuk check stream availability
    */
   testVideoPlayback: async (url: string): Promise<{ playable: boolean; error?: string }> => {
-    return new Promise((resolve) => {
-      const video = document.createElement('video');
-      const timeout = setTimeout(() => {
-        video.src = '';
-        resolve({ playable: false, error: 'Playback test timeout' });
-      }, 10000); // 10 detik timeout
-
-      video.onloadedmetadata = () => {
-        clearTimeout(timeout);
-        video.src = '';
-        resolve({ playable: true });
-      };
-
-      video.onerror = () => {
-        clearTimeout(timeout);
-        const errorCode = video.error?.code;
-        let errorMsg = 'Unknown error';
-        
-        if (errorCode === 1) errorMsg = 'MEDIA_ERR_ABORTED';
-        if (errorCode === 2) errorMsg = 'MEDIA_ERR_NETWORK';
-        if (errorCode === 3) errorMsg = 'MEDIA_ERR_DECODE';
-        if (errorCode === 4) errorMsg = 'MEDIA_ERR_SRC_NOT_SUPPORTED';
-        
-        video.src = '';
-        resolve({ playable: false, error: errorMsg });
-      };
-
-      video.crossOrigin = 'anonymous';
-      video.src = url;
-    });
-  },
-
-  /**
-   * Cek apakah link CDN bisa diakses dan test playback di freeplays.vercel.app
-   * Strategy: Check alternative URL (freeplays.vercel.app) bukan CDN asli
-   */
-  checkLinkAccess: async (url: string): Promise<LinkCheckResult> => {
-    const videoId = linkValidator.extractVideoId(url);
-    const alternativeUrl = linkValidator.getAlternativeUrl(url);
-    
     try {
-      // Step 1: Check apakah alternative URL accessible
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const response = await fetch(alternativeUrl, {
-        method: 'HEAD',
+      // Try fetching dengan Range request (untuk streaming support)
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Range': 'bytes=0-1', // Request hanya 1 byte untuk test
+        },
         mode: 'cors',
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
-      // Step 2: Test playback pada alternative URL jika accessible
-      let isPlayable = false;
-      let playbackError = undefined;
-
-      if (response.ok || response.status === 0) {
-        try {
-          const playbackResult = await linkValidator.testVideoPlayback(alternativeUrl);
-          isPlayable = playbackResult.playable;
-          playbackError = playbackResult.error;
-        } catch (playbackErr) {
-          isPlayable = false;
-          playbackError = 'Playback test failed';
-        }
-      } else if (response.status !== 0) {
-        // Alternative URL tidak accessible, coba test playback langsung
-        try {
-          const playbackResult = await linkValidator.testVideoPlayback(alternativeUrl);
-          isPlayable = playbackResult.playable;
-          playbackError = playbackResult.error;
-        } catch (playbackErr) {
-          isPlayable = false;
-          playbackError = `HTTP ${response.status}: ${playbackErr instanceof Error ? playbackErr.message : 'Unknown error'}`;
-        }
+      // Status 200, 206 (Partial Content), atau 302 (redirect) semua OK
+      const isPlayable = response.ok || response.status === 206 || response.status === 302;
+      
+      if (isPlayable) {
+        return { playable: true };
+      } else {
+        return { 
+          playable: false, 
+          error: `HTTP ${response.status}` 
+        };
       }
+    } catch (error) {
+      return {
+        playable: false,
+        error: error instanceof Error ? error.message : 'Fetch failed',
+      };
+    }
+  },
+
+  /**
+   * Cek apakah link bisa diakses dan playable di freeplays.vercel.app
+   * Strategy: Fetch alternative URL (freeplays.vercel.app/video/ID) langsung
+   */
+  checkLinkAccess: async (url: string): Promise<LinkCheckResult> => {
+    const videoId = linkValidator.extractVideoId(url);
+    const alternativeUrl = linkValidator.getAlternativeUrl(url);
+    
+    try {
+      // Test playback langsung di alternative URL
+      const playbackResult = await linkValidator.testVideoPlayback(alternativeUrl);
 
       return {
         id: videoId,
         video_url: url, // Keep original CDN URL
         alternativeUrl: alternativeUrl,
-        isValid: response.ok || response.status === 0,
-        isPlayable: isPlayable, // Check hasil dari alternative URL
-        statusCode: response.status,
-        playbackError: playbackError,
+        isValid: playbackResult.playable, // Jika accessible = valid
+        isPlayable: playbackResult.playable, // Jika bisa di-fetch = playable
+        playbackError: playbackResult.error,
         checkedAt: new Date().toISOString(),
       };
     } catch (error) {
