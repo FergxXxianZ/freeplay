@@ -75,7 +75,7 @@ export const HomePage: React.FC = () => {
             }}>
               Stream Unlimited<br />Free Videos
             </h1>
-            <a
+            {/*<a
               href="#content"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -91,7 +91,7 @@ export const HomePage: React.FC = () => {
             >
               <Play style={{ width: 16, height: 16, fill: '#fff' }} />
               Browse All
-            </a>
+            </a>*/}
           </div>
         </div>
       )}
