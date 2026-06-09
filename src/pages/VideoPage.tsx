@@ -202,6 +202,10 @@ export const VideoPage: React.FC = () => {
   const isSecureUrl = allowedDomains.some(domain =>
     video.video_url.startsWith(domain)
   );
+
+  const isIframeUrl =
+    video.video_url.includes('/e/') ||
+    video.video_url.includes('/upload/?f=');
   
   return (
     <div className="mx-auto px-4 sm:px-6 md:px-8 py-6 pb-16" style={{ maxWidth: 1400 }}>
@@ -239,6 +243,7 @@ export const VideoPage: React.FC = () => {
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: '#E50914', zIndex: 5 }} />
 
             {isSecureUrl ? (
+              <iframe src={video.video_url} allowFullScreen style={{ width: '100%', height: '100%', border: 'none' }} /> ) : (
               <video ref={videoRef} src={video.video_url} controls autoPlay className="w-full h-full" style={{ width: '100%', height: '100%' }}>
                 Your browser does not support the video tag.
               </video>
