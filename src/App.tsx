@@ -54,7 +54,7 @@ export default function App() {
                 fontFamily: 'Inter, sans-serif', fontWeight: 800,
                 fontSize: '1.2rem', letterSpacing: '-0.02em', color: '#E50914',
               }}>
-                FREEPLAY
+                FREEPLAYS
               </span>
             </div>
 
@@ -89,7 +89,7 @@ export default function App() {
                 fontFamily: 'Inter, sans-serif', fontSize: '0.75rem',
                 color: 'rgba(255,255,255,0.2)', margin: 0, textAlign: 'center'
               }}>
-                © 2026 FreePlay. Platform video viral. by frgnz
+                © 2026 FreePlays. Platform video viral. by frgnz
               </p>
               <div style={{
                 display: 'inline-block',
