@@ -189,6 +189,8 @@ export const VideoPage: React.FC = () => {
     'https://assets.vid4me.com/',
     'https://interstitial.slicedrive.com/',
     'https://cdn2.slicedrive.com/',
+    'https://aceimg.com/', 
+    'https://aceimg.com/upload/?f=', 
     'https://cdn2.slicedrive.co/', 
     'https://media.slicedrive.com/',
     'https://cdn.videy.co/',
