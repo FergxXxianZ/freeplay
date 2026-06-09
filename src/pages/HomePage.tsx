@@ -62,7 +62,7 @@ export const HomePage: React.FC = () => {
               marginBottom: 12,
             }}>
               <Film style={{ width: 11, height: 11 }} />
-              FreePlay Original
+              FreePlays Original
             </div>
             <h1 className="text-3xl md:text-5xl lg:text-[2.2rem]" style={{
               fontFamily: 'Inter, sans-serif',
