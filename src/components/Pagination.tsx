@@ -16,17 +16,10 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
   };
 
   const renderPageNumbers = () => {
-    const pages = [];
-    const maxVisible = 10;
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages, start + maxVisible - 1);
-    if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
+    const items = [];
 
-    const renderPageNumbers = () => {
-      const items = [];
-
-      const addPage = (page: number) => {
-        const isActive = currentPage === page;
+    const addPage = (page: number) => {
+      const isActive = currentPage === page;
 
         items.push(
           <Link
@@ -51,7 +44,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
           >
             {page}
           </Link>
-        );
+    );
   };
 
   const addDots = (key: string) => {
