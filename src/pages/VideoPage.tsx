@@ -244,10 +244,26 @@ export const VideoPage: React.FC = () => {
 
             {isSecureUrl ? (
               isIframeUrl ? (
-              <iframe src={video.video_url} allowFullScreen style={{ width: '100%', height: '100%', border: 'none' }} /> ) : (
-              <video ref={videoRef} src={video.video_url} controls autoPlay className="w-full h-full" style={{ width: '100%', height: '100%' }}>
-                Your browser does not support the video tag.
-              </video>
+                <iframe
+                  src={video.video_url}
+                  allowFullScreen
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none'
+                  }}
+                />
+              ) : (
+                <video
+                  ref={videoRef}
+                  src={video.video_url}
+                  controls
+                  autoPlay
+                  className="w-full h-full"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              )
             ) : (
               <div style={{
                 width: '100%', height: '100%',
