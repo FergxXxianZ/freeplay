@@ -23,7 +23,7 @@ export const Navbar: React.FC = () => {
             <div className="bg-red-600 p-1.5 rounded-lg group-hover:bg-red-500 transition-colors">
               <Play className="w-6 h-6 text-white fill-current" />
             </div>
-            <span className="text-xl font-bold tracking-tighter text-white uppercase">FreePlay</span>
+            <span className="text-xl font-bold tracking-tighter text-white uppercase">FreePlays</span>
           </Link>
 
           <form onSubmit={handleSearch} className="flex-1 max-w-md mx-4">
