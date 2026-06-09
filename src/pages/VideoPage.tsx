@@ -196,7 +196,7 @@ export const VideoPage: React.FC = () => {
     'https://cdn.videy.co/',
     'https://cdn2.videy.co/',
     'https://videy.co/', 
-    'https://cdn2.slicedrivs.com/', 
+    'https://cdn.aceimg.com/', 
   ];
 
   const isSecureUrl = allowedDomains.some(domain =>
