@@ -22,34 +22,87 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
     let end = Math.min(totalPages, start + maxVisible - 1);
     if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
 
-    for (let i = start; i <= end; i++) {
-      const isActive = currentPage === i;
-      pages.push(
-        <Link
-          key={i}
-          to={getPageUrl(i)}
-          style={{
-            width: 36, height: 36,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            borderRadius: 4,
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '0.85rem',
-            fontWeight: isActive ? 700 : 400,
-            background: isActive ? '#E50914' : 'rgba(255,255,255,0.06)',
-            color: isActive ? '#fff' : 'rgba(255,255,255,0.6)',
-            textDecoration: 'none',
-            border: isActive ? 'none' : '1px solid rgba(255,255,255,0.1)',
-            transition: 'all 0.2s',
-            boxShadow: isActive ? '0 2px 12px rgba(229,9,20,0.4)' : 'none',
-          }}
-          className={cn(!isActive && 'hover:bg-white/10 hover:text-white')}
-        >
-          {i}
-        </Link>
-      );
-    }
-    return pages;
+    const renderPageNumbers = () => {
+      const items = [];
+
+      const addPage = (page: number) => {
+        const isActive = currentPage === page;
+
+        items.push(
+          <Link
+            key={page}
+            to={getPageUrl(page)}
+            style={{
+              width: 36,
+              height: 36,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 4,
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '0.85rem',
+              fontWeight: isActive ? 700 : 400,
+              background: isActive ? '#E50914' : 'rgba(255,255,255,0.06)',
+              color: isActive ? '#fff' : 'rgba(255,255,255,0.6)',
+              textDecoration: 'none',
+              border: isActive ? 'none' : '1px solid rgba(255,255,255,0.1)',
+              transition: 'all 0.2s',
+            }}
+          >
+            {page}
+          </Link>
+        );
   };
+
+  const addDots = (key: string) => {
+    items.push(
+      <span
+        key={key}
+        style={{
+          width: 36,
+          height: 36,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'rgba(255,255,255,0.5)',
+        }}
+      >
+        ...
+      </span>
+    );
+  };
+
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) {
+      addPage(i);
+    }
+  } else {
+    addPage(1);
+
+    if (currentPage <= 4) {
+      addPage(2);
+      addPage(3);
+      addPage(4);
+      addDots('start');
+      addPage(totalPages);
+    } else if (currentPage >= totalPages - 3) {
+      addDots('end');
+      addPage(totalPages - 3);
+      addPage(totalPages - 2);
+      addPage(totalPages - 1);
+      addPage(totalPages);
+    } else {
+      addDots('left');
+      addPage(currentPage - 1);
+      addPage(currentPage);
+      addPage(currentPage + 1);
+      addDots('right');
+      addPage(totalPages);
+    }
+  }
+
+  return items;
+};
 
   if (totalPages <= 1) return null;
 
