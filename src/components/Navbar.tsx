@@ -88,7 +88,7 @@ export const Navbar: React.FC = () => {
                 }}
                 className="text-xl sm:text-[1.4rem]"
                 >
-                  FREEPLAY
+                  FREEPLAYS
                 </span>
               </div>
             </Link>
