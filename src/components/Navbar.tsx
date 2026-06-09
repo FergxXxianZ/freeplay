@@ -323,7 +323,7 @@ export const Navbar: React.FC = () => {
               fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: '1.1rem',
               letterSpacing: '-0.02em', color: '#E50914',
             }}>
-              FREEPLAY
+              FREEPLAYS
             </span>
           </div>
           <button
@@ -470,7 +470,7 @@ export const Navbar: React.FC = () => {
             </div>
             <div>
               <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '0.82rem', color: '#fff', margin: 0 }}>
-                FreePlay
+                FreePlays
               </p>
               <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', margin: 0 }}>
                 Guest User
