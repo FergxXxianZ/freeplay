@@ -193,8 +193,8 @@ export const VideoPage: React.FC = () => {
     'https://media.slicedrive.com/',
     'https://cdn.videy.co/',
     'https://cdn2.videy.co/',
-    'https://videy.co/'
-    'https://cdn2.slicedrivs.com/'
+    'https://videy.co/', 
+    'https://cdn2.slicedrivs.com/', 
   ];
 
   const isSecureUrl = allowedDomains.some(domain =>
