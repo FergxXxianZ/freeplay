@@ -186,8 +186,7 @@ export const VideoPage: React.FC = () => {
   const allowedDomains = [
     'https://vid30s.com/',
     'https://cdn2.slirpdrive.com/', 
-    'https://cdn.slicsdrive.com/', 
-    'http://cdn.slicsdrive.com/'
+    'https://cdn.slicsdrive.com/',
     'https://assets.vid4me.com/',
     'https://interstitial.slicedrive.com/',
     'https://cdn2.slicedrive.com/',
