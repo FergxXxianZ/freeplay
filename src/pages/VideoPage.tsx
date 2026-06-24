@@ -90,24 +90,6 @@ export const VideoPage: React.FC = () => {
     }
   }, [id]);
 
-  useEffect(() => {
-    const script = document.createElement('script');
-
-    script.src =
-      'https://pl29883013.effectivecpmnetwork.com/00b0c9d96d5d83fb01b522176a74cd79/invoke.js';
-
-    script.async = true;
-    script.setAttribute('data-cfasync', 'false');
-
-    document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
-
   const handleLike = () => {
     if (!id) return;
 
