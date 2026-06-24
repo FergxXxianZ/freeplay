@@ -290,7 +290,7 @@ export const VideoPage: React.FC = () => {
             <div id="container-00b0c9d96d5d83fb01b522176a74cd79"
               style={{
                 width: '100%',
-                maxWidth: '320px'
+                maxWidth: '280px'
               }}></div>
           </div>
 
