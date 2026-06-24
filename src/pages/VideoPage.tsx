@@ -5,7 +5,6 @@ import { Video } from '../types';
 import { VideoCard } from '../components/VideoCard';
 import { ChevronLeft, Share2, ThumbsUp, Eye, Play} from 'lucide-react';
 import { motion } from 'motion/react';
-import { Eye } from 'lucide-react';
 
 export const VideoPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -90,6 +89,24 @@ export const VideoPage: React.FC = () => {
       }
     }
   }, [id]);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+
+    script.src =
+      'https://pl29883013.effectivecpmnetwork.com/00b0c9d96d5d83fb01b522176a74cd79/invoke.js';
+
+    script.async = true;
+    script.setAttribute('data-cfasync', 'false');
+
+    document.body.appendChild(script);
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
 
   const handleLike = () => {
     if (!id) return;
@@ -275,6 +292,20 @@ export const VideoPage: React.FC = () => {
                 Error: Sumber video tidak valid
               </div>
             )}
+          </div>
+          {/* ADS BANNER */}
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: '20px',
+              marginBottom: '20px',
+              minHeight: '90px'
+            }}
+          >
+            <div id="container-00b0c9d96d5d83fb01b522176a74cd79"></div>
           </div>
 
           {/* Info */}
