@@ -195,6 +195,7 @@ export const VideoPage: React.FC = () => {
     'https://media.slicedrive.com/',
     'https://cdn.videy.co/',
     'https://cdn2.videy.co/',
+    'https://cdn2.vidpme.com/'
     'https://videy.co/', 
     'https://cdn2.aceimg.com/',
     'https://cdn2.vildey.com/', 
