@@ -197,7 +197,6 @@ export const VideoPage: React.FC = () => {
     'https://cdn2.videy.co/',
     'https://videy.co/', 
     'https://cdn2.aceimg.com/',
-    'https://cdn2.vidpme.com/', 
     'https://cdn2.vildey.com/', 
     'https://cdn.aceimg.com/', 
   ];
